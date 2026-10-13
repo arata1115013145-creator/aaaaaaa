@@ -147,7 +147,6 @@
             opacity: 0;
             text-align: center;
         }
-        /* 吹き出しの下にしっぽを付けるデザイン */
         #comicToast::after {
             content: '';
             position: absolute;
@@ -744,6 +743,7 @@
                 viewSelect.innerHTML += `<option value="${key}">${prefNames[key]}</option>`;
                 addSelect.innerHTML += `<option value="${key}">${prefNames[key]}</option>`;
 
+                // 🟡 データがある県に .has-data クラスを付与して黄色に変える処理
                 const pathEl = document.getElementById(key);
                 if (pathEl) {
                     if (memories[key] && memories[key].length > 0) {
@@ -909,39 +909,13 @@
             };
 
             const files = fileInput.files;
-            if (files && files.length > 0) {
-                let processedFiles = 0;
-                for (let i = 0; i < files.length; i++) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        newMemory.photos.push(e.target.result);
-                        processedFiles++;
-                        if (processedFiles === files.length) {
-                            memories[id].push(newMemory);
-                            saveMemories();
-                            initApp();
-                            
-                            // 💬 漫画の吹き出し風ポップアップを表示 (1秒間)
-                            showComicToast();
 
-                            const form = document.getElementById('memoryForm');
-                            if (form) form.reset();
-                            
-                            setTimeout(() => {
-                                switchScreen('view');
-                                const viewSelect = document.getElementById('viewPrefSelect');
-                                if (viewSelect) viewSelect.value = id;
-                                showMemory(id);
-                            }, 800);
-                        }
-                    };
-                    reader.readAsDataURL(files[i]);
-                }
-            } else {
+            // 共通の保存・通知・画面切り替え処理
+            function finalizeSave() {
                 memories[id].push(newMemory);
                 saveMemories();
                 initApp();
-                
+
                 // 💬 漫画の吹き出し風ポップアップを表示 (1秒間)
                 showComicToast();
 
@@ -953,7 +927,24 @@
                     const viewSelect = document.getElementById('viewPrefSelect');
                     if (viewSelect) viewSelect.value = id;
                     showMemory(id);
-                }, 800);
+                }, 900);
+            }
+
+            if (files && files.length > 0) {
+                let processedFiles = 0;
+                for (let i = 0; i < files.length; i++) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        newMemory.photos.push(e.target.result);
+                        processedFiles++;
+                        if (processedFiles === files.length) {
+                            finalizeSave();
+                        }
+                    };
+                    reader.readAsDataURL(files[i]);
+                }
+            } else {
+                finalizeSave();
             }
         }
 
