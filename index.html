@@ -126,6 +126,46 @@
             cursor: pointer;
         }
 
+        /* 💬 漫画の吹き出し風ポップアップ通知 */
+        #comicToast {
+            display: none;
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: #ffffff;
+            border: 3px solid #2c3e50;
+            border-radius: 20px;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            z-index: 10000;
+            pointer-events: none;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            opacity: 0;
+            text-align: center;
+        }
+        /* 吹き出しの下にしっぽを付けるデザイン */
+        #comicToast::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 12px 10px 0 10px;
+            border-style: solid;
+            border-color: #2c3e50 transparent;
+            display: block;
+            width: 0;
+        }
+        #comicToast.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
         /* 🔍 iPhoneの写真アプリ風ライトボックス */
         #lightbox {
             display: none;
@@ -281,13 +321,15 @@
 
     <h1>🗺️ 旅行の思い出アルバム</h1>
 
+    <!-- 💬 漫画の吹き出し風通知ポップアップ -->
+    <div id="comicToast">💬 思い出が保存されました！</div>
+
     <!-- 画面①：日本地図（ホーム） -->
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
             <p style="font-size: 11px; color: #666; margin-bottom: 4px;">思い出のある県は黄色に変わります！</p>
             
-            <!-- 🔍 制限・ズーム対応の地図コンテナ -->
             <div class="map-container" id="mapContainer">
                 <svg class="japan-map" id="japanMap" viewBox="0 0 540 540">
                     <!-- 北海道・東北 -->
@@ -522,6 +564,16 @@
 
         let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
         let currentPhotosArray = [];
+
+        // 💬 漫画の吹き出し風ポップアップを表示する関数（1秒後に自動で消える）
+        function showComicToast() {
+            const toast = document.getElementById('comicToast');
+            if (!toast) return;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1000); // 1秒表示
+        }
 
         // 🗺️ ズーム・中心点・移動制御
         let scale = 1;
@@ -868,13 +920,19 @@
                             memories[id].push(newMemory);
                             saveMemories();
                             initApp();
-                            alert(`写真を ${files.length}枚 一気に保存しました！✨`);
+                            
+                            // 💬 漫画の吹き出し風ポップアップを表示 (1秒間)
+                            showComicToast();
+
                             const form = document.getElementById('memoryForm');
                             if (form) form.reset();
-                            switchScreen('view');
-                            const viewSelect = document.getElementById('viewPrefSelect');
-                            if (viewSelect) viewSelect.value = id;
-                            showMemory(id);
+                            
+                            setTimeout(() => {
+                                switchScreen('view');
+                                const viewSelect = document.getElementById('viewPrefSelect');
+                                if (viewSelect) viewSelect.value = id;
+                                showMemory(id);
+                            }, 800);
                         }
                     };
                     reader.readAsDataURL(files[i]);
@@ -883,13 +941,19 @@
                 memories[id].push(newMemory);
                 saveMemories();
                 initApp();
-                alert('追加しました！');
+                
+                // 💬 漫画の吹き出し風ポップアップを表示 (1秒間)
+                showComicToast();
+
                 const form = document.getElementById('memoryForm');
                 if (form) form.reset();
-                switchScreen('view');
-                const viewSelect = document.getElementById('viewPrefSelect');
-                if (viewSelect) viewSelect.value = id;
-                showMemory(id);
+
+                setTimeout(() => {
+                    switchScreen('view');
+                    const viewSelect = document.getElementById('viewPrefSelect');
+                    if (viewSelect) viewSelect.value = id;
+                    showMemory(id);
+                }, 800);
             }
         }
 
