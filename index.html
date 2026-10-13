@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>日本地図 旅行の思い出アルバム</title>
+    <title>旅行の思い出アルバム</title>
 
     <!-- スマホのホーム画面から開いたときにブラウザの枠を消す設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,47 +12,86 @@
 
     <style>
         body { 
-            font-family: 'Hiragino Sans', 'Meiryo', sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Meiryo', sans-serif; 
             text-align: center; 
             margin: 0; 
-            padding: 2px 6px 75px 6px; 
-            background-color: #d4e3f7; 
-            color: #333;
+            padding: 0 0 85px 0; 
+            background-color: #e4edf8; 
+            color: #2c3e50;
         }
-        h1 { color: #2c3e50; font-size: 15px; margin: 2px 0 4px 0; }
+
+        /* 🎨 全体の洗練されたヘッダーエリア */
+        .app-header {
+            background-color: #e4edf8;
+            padding: 14px 10px 8px 10px;
+        }
+        h1 { 
+            color: #4b6a94; 
+            font-size: 20px; 
+            margin: 0 0 6px 0; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .section-title {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 6px 0 4px 0;
+        }
+        .subtitle {
+            font-size: 11px; 
+            color: #556b82; 
+            margin: 0 0 10px 0;
+        }
 
         .screen {
             display: none; 
             max-width: 600px;
             margin: 0 auto;
+            padding: 0 10px;
         }
         .screen.active {
             display: block; 
         }
         
+        /* ☁️ 白いカードコンテナ */
         .container {
             background: #ffffff;
-            padding: 6px 10px;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            padding: 12px 14px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 16px rgba(100, 120, 150, 0.08);
             text-align: left;
         }
-        .container h3 { margin-top: 0; margin-bottom: 4px; color: #2c3e50; font-size: 13px; border-bottom: 2px solid #2ec4b6; padding-bottom: 2px; }
+        .container h3 { 
+            margin-top: 0; 
+            margin-bottom: 8px; 
+            color: #3b526d; 
+            font-size: 14px; 
+            border-bottom: 1.5px solid #edf2f7; 
+            padding-bottom: 6px; 
+        }
 
-        /* 🗺️ 地図コンテナ */
+        /* 🗺️ 日本地図コンテナ（タイル風マップ） */
+        .map-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 12px 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 16px rgba(100, 120, 150, 0.08);
+        }
         .map-container {
             position: relative;
             width: 100%;
             max-width: 360px;
-            height: 380px;
+            height: 390px;
             margin: 0 auto;
             overflow: hidden;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            background: #f8fafc;
+            border-radius: 12px;
+            background: #fafbfc;
             touch-action: none;
             cursor: grab;
+            border: 1px solid #f0f3f6;
         }
         .map-container:active {
             cursor: grabbing;
@@ -66,62 +105,63 @@
             will-change: transform;
         }
 
+        /* 🧩 タイル風県パーツのスタイル */
         .pref {
-            fill: #e3ebd0; 
-            stroke: #7f8c8d; 
-            stroke-width: 0.6;
+            fill: #ffffff; 
+            stroke: #4b6a94; 
+            stroke-width: 0.8;
+            stroke-linejoin: round;
             cursor: pointer;
             transition: fill 0.2s;
         }
-        .pref:hover { fill: #b8c79b; }
+        .pref:hover { fill: #f0f4f8; }
         
-        /* 🟡 思い出がある県の色（明るい黄色） */
+        /* 🟡 思い出がある県のパステルイエロー色 */
         .has-data { 
-            fill: #ffe066 !important; 
+            fill: #fff5cc !important; 
         }
         .has-data:hover { 
-            fill: #fcc419 !important; 
+            fill: #ffeb99 !important; 
         }
 
         .pref-label {
-            font-size: 8px;
-            font-weight: bold;
-            fill: #4a4a4a;
+            font-size: 7.5px;
+            font-weight: 600;
+            fill: #3b526d;
             pointer-events: none;
             text-anchor: middle;
         }
 
         .memory-card {
-            background: #fdfdfd;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px 10px;
-            margin-bottom: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: #fafbfc;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
         }
         .memory-card h3 {
-            margin: 0 0 4px 0;
+            margin: 0 0 6px 0;
             font-size: 13px;
-            color: #2ec4b6;
+            color: #4b6a94;
             border: none;
         }
 
-        /* 📸 通常時の横スクロールギャラリー */
+        /* 📸 横スクロールギャラリー */
         .gallery {
             display: flex;
             gap: 6px;
             overflow-x: auto;
             padding-bottom: 4px;
-            margin-top: 4px;
+            margin-top: 6px;
             -webkit-overflow-scrolling: touch;
         }
         .gallery img { 
             width: 90px; 
             height: 90px; 
             object-fit: cover; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             border: 2px solid #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             flex-shrink: 0;
             cursor: pointer;
         }
@@ -134,13 +174,13 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(0.8);
             background: #ffffff;
-            border: 3px solid #2c3e50;
+            border: 2.5px solid #4b6a94;
             border-radius: 20px;
             padding: 14px 24px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
-            color: #2c3e50;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            color: #4b6a94;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             z-index: 10000;
             pointer-events: none;
             transition: transform 0.2s ease, opacity 0.2s ease;
@@ -150,12 +190,12 @@
         #comicToast::after {
             content: '';
             position: absolute;
-            bottom: -12px;
+            bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            border-width: 12px 10px 0 10px;
+            border-width: 10px 8px 0 8px;
             border-style: solid;
-            border-color: #2c3e50 transparent;
+            border-color: #4b6a94 transparent;
             display: block;
             width: 0;
         }
@@ -165,7 +205,7 @@
             opacity: 1;
         }
 
-        /* 🔍 iPhoneの写真アプリ風ライトボックス */
+        /* 🔍 写真ライトボックス */
         #lightbox {
             display: none;
             position: fixed;
@@ -244,90 +284,107 @@
             background-color: #ff6b6b;
             color: white;
             border: none;
-            padding: 4px 8px;
+            padding: 5px 10px;
             font-size: 11px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 4px;
+            margin-top: 6px;
         }
         .delete-btn:hover { background-color: #fa5252; }
 
         .form-group {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .form-group label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 2px;
-            font-size: 11px;
-            color: #4a4a4a;
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 12px;
+            color: #4b6a94;
         }
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            padding: 5px 6px;
+            padding: 7px 8px;
             box-sizing: border-box;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #fff;
         }
         .submit-btn {
-            background-color: #2ec4b6;
+            background-color: #4b6a94;
             color: white;
             border: none;
-            padding: 7px;
-            font-size: 12px;
+            padding: 10px;
+            font-size: 13px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 2px 6px rgba(46, 196, 182, 0.4);
+            box-shadow: 0 4px 12px rgba(75, 106, 148, 0.3);
+            margin-top: 4px;
         }
-        .submit-btn:hover { background-color: #20a498; }
+        .submit-btn:hover { background-color: #3b526d; }
 
-        /* 📱 下部メニューバー */
+        /* 📱 下部ナビゲーションバー（画像に合わせた美しいスタイル） */
         .nav-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #ffffff;
+            background: #e4edf8;
             display: flex;
             justify-content: space-around;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.12);
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
             z-index: 1000;
-            padding: 6px 0 16px 0;
+            padding: 8px 0 20px 0;
+            border-top: 1px solid #d0deee;
         }
         .nav-btn {
             background: none;
             border: none;
-            font-size: 12px;
-            font-weight: bold;
-            color: #64748b;
+            font-size: 11px;
+            font-weight: 600;
+            color: #7c90aa;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 3px;
             flex: 1;
         }
-        .nav-btn span { font-size: 20px; }
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: #7c90aa;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         .nav-btn.active {
-            color: #2ec4b6;
+            color: #3b526d;
+        }
+        .nav-btn.active svg {
+            stroke: #3b526d;
         }
     </style>
 </head>
 <body>
 
-    <h1>旅行の思い出アルバム</h1>
+    <!-- ヘッダーエリア -->
+    <div class="app-header">
+        <h1>旅行の思い出アルバム</h1>
+    </div>
 
     <!-- 💬 漫画の吹き出し風ポップアップ通知 -->
     <div id="comicToast">思い出が保存されました！</div>
 
     <!-- 画面①：日本地図（ホーム） -->
     <div id="screen-map" class="screen active">
-        <div class="container" style="text-align: center;">
-            <h3>日本マップ</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">思い出のある県は黄色に変わります！</p>
+        <div class="map-card">
+            <div class="section-title">日本マップ</div>
+            <div class="subtitle">思い出のある県はパステルイエローに変わります！</div>
             
             <div class="map-container" id="mapContainer">
                 <svg class="japan-map" id="japanMap" viewBox="0 0 540 540">
@@ -528,7 +585,7 @@
         </div>
     </div>
 
-    <!-- 🔍 iPhoneの写真アプリ風ライトボックス -->
+    <!-- 🔍 写真ライトボックス -->
     <div id="lightbox">
         <div class="lightbox-header">
             <button class="lightbox-close" onclick="closeLightbox()">✕ 閉じる</button>
@@ -537,16 +594,19 @@
         <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
     </div>
 
-    <!-- 画面下部のタブバー（絵文字付き復元版） -->
+    <!-- 画面下部のタブバー（画像準拠のSVGアイコン） -->
     <div class="nav-bar">
         <button class="nav-btn active" id="nav-map" onclick="switchScreen('map')">
-            <span>🗺️</span>日本地図
+            <svg viewBox="0 0 24 24"><path d="M9 18l-6-.5V6l6 .5M9 18l6-1.5m-6 1.5v-12l6 1.5m0 10.5l6-.5V5l-6 .5m0 12v-12"/></svg>
+            日本地図
         </button>
         <button class="nav-btn" id="nav-view" onclick="switchScreen('view')">
-            <span>📖</span>思い出を見る
+            <svg viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            思い出を見る
         </button>
         <button class="nav-btn" id="nav-add" onclick="switchScreen('add')">
-            <span>➕</span>追加する
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+            追加する
         </button>
     </div>
 
@@ -821,7 +881,7 @@
                 area.innerHTML = `
                     <h3>${prefName}の思い出</h3>
                     <p style="color:#888; font-size:12px;">この地域の思い出はまだ登録されていません。</p>
-                    <button class="submit-btn" style="margin-top:4px; background:#2ec4b6; font-size:12px; padding:6px;" onclick="openAddForPref('${prefKey}')">この地域の思い出を追加する</button>
+                    <button class="submit-btn" style="margin-top:6px; background:#4b6a94; font-size:12px; padding:8px;" onclick="openAddForPref('${prefKey}')">この地域の思い出を追加する</button>
                 `;
                 return;
             }
@@ -852,7 +912,7 @@
             area.innerHTML = `
                 <h3>${prefName}の思い出（全 ${list.length} 件）</h3>
                 ${cardsHtml}
-                <button class="submit-btn" style="margin-top:4px; background:#2ec4b6; font-size:12px; padding:6px;" onclick="openAddForPref('${prefKey}')">さらに追加する</button>
+                <button class="submit-btn" style="margin-top:6px; background:#4b6a94; font-size:12px; padding:8px;" onclick="openAddForPref('${prefKey}')">さらに追加する</button>
             `;
         }
 
