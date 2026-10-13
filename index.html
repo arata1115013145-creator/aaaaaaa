@@ -295,20 +295,22 @@
             justify-content: space-around;
             box-shadow: 0 -2px 12px rgba(0,0,0,0.12);
             z-index: 1000;
-            padding: 10px 0 16px 0;
+            padding: 6px 0 16px 0;
         }
         .nav-btn {
             background: none;
             border: none;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #64748b;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 2px;
             flex: 1;
         }
+        .nav-btn span { font-size: 20px; }
         .nav-btn.active {
             color: #2ec4b6;
         }
@@ -535,11 +537,17 @@
         <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
     </div>
 
-    <!-- 画面下部のタブバー（絵文字削除版） -->
+    <!-- 画面下部のタブバー（絵文字付き復元版） -->
     <div class="nav-bar">
-        <button class="nav-btn active" id="nav-map" onclick="switchScreen('map')">日本地図</button>
-        <button class="nav-btn" id="nav-view" onclick="switchScreen('view')">思い出を見る</button>
-        <button class="nav-btn" id="nav-add" onclick="switchScreen('add')">追加する</button>
+        <button class="nav-btn active" id="nav-map" onclick="switchScreen('map')">
+            <span>🗺️</span>日本地図
+        </button>
+        <button class="nav-btn" id="nav-view" onclick="switchScreen('view')">
+            <span>📖</span>思い出を見る
+        </button>
+        <button class="nav-btn" id="nav-add" onclick="switchScreen('add')">
+            <span>➕</span>追加する
+        </button>
     </div>
 
     <script>
