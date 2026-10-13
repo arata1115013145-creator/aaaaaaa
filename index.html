@@ -73,9 +73,16 @@
             cursor: pointer;
             transition: fill 0.2s;
         }
-        .pref:hover { fill: #ffd166; }
-        .has-data { fill: #2ec4b6 !important; }
-        .has-data:hover { fill: #20a498 !important; }
+        .pref:hover { fill: #b8c79b; }
+        
+        /* 🟡 思い出がある県の色（明るい黄色） */
+        .has-data { 
+            fill: #ffe066 !important; 
+        }
+        .has-data:hover { 
+            fill: #fcc419 !important; 
+        }
+
         .pref-label {
             font-size: 8px;
             font-weight: bold;
@@ -278,9 +285,9 @@
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">指二本を置いた場所を中心にピンチズームできます！</p>
+            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">思い出のある県は黄色に変わります！</p>
             
-            <!-- 🔍 指の間の中心点ズーム対応の地図コンテナ -->
+            <!-- 🔍 制限・ズーム対応の地図コンテナ -->
             <div class="map-container" id="mapContainer">
                 <svg class="japan-map" id="japanMap" viewBox="0 0 540 540">
                     <!-- 北海道・東北 -->
@@ -618,7 +625,6 @@
                     const newScale = scale * zoomFactor;
 
                     if (newScale >= 1 && newScale <= 3.5) {
-                        // 二本指の真ん中を中心にズーム計算
                         pointX = currentCenter.x - (currentCenter.x - pointX) * (newScale / scale);
                         pointY = currentCenter.y - (currentCenter.y - pointY) * (newScale / scale);
                         scale = newScale;
