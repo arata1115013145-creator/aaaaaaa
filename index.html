@@ -561,17 +561,68 @@
             fukuoka: "福岡県", saga: "佐賀県", nagasaki: "長崎県", kumamoto: "熊本県", oita: "大分県", miyazaki: "宮崎県", kagoshima: "鹿児島県", okinawa: "沖縄県"
         };
 
-        let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
+        let memories = {};
+        let db = null;
+
+        // 💾 データベース（IndexedDB）の初期化（タブを閉じても消えない強力な保存先）
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open("TravelAlbumDB", 1);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains("memories")) {
+                        database.createObjectStore("memories");
+                    }
+                };
+            });
+        }
+
+        function loadMemoriesFromDB() {
+            return new Promise((resolve) => {
+                if (!db) {
+                    resolve({});
+                    return;
+                }
+                const transaction = db.transaction(["memories"], "readonly");
+                const store = transaction.objectStore("memories");
+                const request = store.get("all_data");
+                request.onsuccess = () => {
+                    memories = request.result || {};
+                    resolve(memories);
+                };
+                request.onerror = () => resolve({});
+            });
+        }
+
+        function saveMemoriesToDB() {
+            return new Promise((resolve) => {
+                if (!db) {
+                    resolve();
+                    return;
+                }
+                const transaction = db.transaction(["memories"], "readwrite");
+                const store = transaction.objectStore("memories");
+                const request = store.put(memories, "all_data");
+                request.onsuccess = () => resolve();
+                request.onerror = () => resolve();
+            });
+        }
+
         let currentPhotosArray = [];
 
-        // 💬 漫画の吹き出し風ポップアップを表示する関数（1秒後に自動で消える）
+        // 💬 漫画の吹き出し風ポップアップを表示する関数
         function showComicToast() {
             const toast = document.getElementById('comicToast');
             if (!toast) return;
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
-            }, 1000); // 1秒表示
+            }, 1000);
         }
 
         // 🗺️ ズーム・中心点・移動制御
@@ -697,10 +748,6 @@
             }
         });
 
-        function saveMemories() {
-            localStorage.setItem('travel_memories', JSON.stringify(memories));
-        }
-
         function switchScreen(screenName) {
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -736,6 +783,7 @@
             
             if (!viewSelect || !addSelect) return;
 
+            const currentViewPref = viewSelect.value;
             viewSelect.innerHTML = '';
             addSelect.innerHTML = '';
 
@@ -752,6 +800,10 @@
                         pathEl.classList.remove('has-data');
                     }
                 }
+            }
+
+            if (currentViewPref) {
+                viewSelect.value = currentViewPref;
             }
 
             if (viewSelect.value) {
@@ -880,7 +932,7 @@
             if (titleInput) titleInput.value = (prefNames[prefKey] || '') + 'の思い出';
         }
 
-        function addMemory(event) {
+        async function addMemory(event) {
             event.preventDefault();
 
             const selectBox = document.getElementById('addPrefSelect');
@@ -910,13 +962,11 @@
 
             const files = fileInput.files;
 
-            // 共通の保存・通知・画面切り替え処理
-            function finalizeSave() {
+            async function finalizeSave() {
                 memories[id].push(newMemory);
-                saveMemories();
+                await saveMemoriesToDB();
                 initApp();
 
-                // 💬 漫画の吹き出し風ポップアップを表示 (1秒間)
                 showComicToast();
 
                 const form = document.getElementById('memoryForm');
@@ -934,31 +984,37 @@
                 let processedFiles = 0;
                 for (let i = 0; i < files.length; i++) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = async function(e) {
                         newMemory.photos.push(e.target.result);
                         processedFiles++;
                         if (processedFiles === files.length) {
-                            finalizeSave();
+                            await finalizeSave();
                         }
                     };
                     reader.readAsDataURL(files[i]);
                 }
             } else {
-                finalizeSave();
+                await finalizeSave();
             }
         }
 
-        function deleteSingleMemory(prefKey, memoryId) {
+        async function deleteSingleMemory(prefKey, memoryId) {
             if (confirm(`この思い出を削除しますか？`)) {
                 memories[prefKey] = memories[prefKey].filter(item => item.id !== memoryId);
-                saveMemories();
+                await saveMemoriesToDB();
                 initApp();
                 showMemory(prefKey);
                 alert('思い出を削除しました。');
             }
         }
 
-        window.onload = function() {
+        window.onload = async function() {
+            try {
+                await initDB();
+                await loadMemoriesFromDB();
+            } catch (e) {
+                console.error(e);
+            }
             initApp();
             applyTransform();
         };
