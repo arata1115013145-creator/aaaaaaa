@@ -15,15 +15,15 @@
             font-family: 'Hiragino Sans', 'Meiryo', sans-serif; 
             text-align: center; 
             margin: 0; 
-            padding: 10px 10px 80px 10px; 
+            padding: 8px 8px 70px 8px; 
             background-color: #d4e3f7; 
             color: #333;
         }
-        h1 { color: #2c3e50; font-size: 20px; margin: 10px 0; }
+        h1 { color: #2c3e50; font-size: 18px; margin: 6px 0; }
 
         .screen {
             display: none; 
-            max-width: 650px;
+            max-width: 600px;
             margin: 0 auto;
         }
         .screen.active {
@@ -32,17 +32,18 @@
         
         .container {
             background: #ffffff;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             text-align: left;
         }
-        .container h3 { margin-top: 0; color: #2c3e50; font-size: 16px; border-bottom: 2px solid #2ec4b6; padding-bottom: 5px; }
+        .container h3 { margin-top: 0; margin-bottom: 8px; color: #2c3e50; font-size: 15px; border-bottom: 2px solid #2ec4b6; padding-bottom: 4px; }
 
+        /* スマホ画面に綺麗に収まるように地図の最大サイズをコンパクトに調整 */
         .japan-map {
             width: 100%;
-            max-width: 450px;
+            max-width: 320px;
             height: auto;
             margin: 0 auto;
             display: block;
@@ -69,68 +70,68 @@
             background: #fdfdfd;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .memory-card h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
+            margin: 0 0 6px 0;
+            font-size: 15px;
             color: #2ec4b6;
             border: none;
         }
 
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 8px;
-            margin-top: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 6px;
+            margin-top: 8px;
         }
         .gallery img { 
             width: 100%; 
-            height: 110px; 
+            height: 90px; 
             object-fit: cover; 
             border-radius: 6px; 
             border: 2px solid #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .delete-btn {
             background-color: #ff6b6b;
             color: white;
             border: none;
-            padding: 6px 12px;
-            font-size: 12px;
+            padding: 5px 10px;
+            font-size: 11px;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .delete-btn:hover { background-color: #fa5252; }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .form-group label {
             display: block;
             font-weight: bold;
-            margin-bottom: 4px;
-            font-size: 13px;
+            margin-bottom: 3px;
+            font-size: 12px;
             color: #4a4a4a;
         }
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            padding: 8px;
+            padding: 7px;
             box-sizing: border-box;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
         }
         .submit-btn {
             background-color: #2ec4b6;
             color: white;
             border: none;
-            padding: 12px;
-            font-size: 15px;
+            padding: 10px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -149,12 +150,12 @@
             justify-content: space-around;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             z-index: 1000;
-            padding: 8px 0;
+            padding: 6px 0;
         }
         .nav-btn {
             background: none;
             border: none;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #64748b;
             cursor: pointer;
@@ -164,7 +165,7 @@
             gap: 2px;
             flex: 1;
         }
-        .nav-btn span { font-size: 20px; }
+        .nav-btn span { font-size: 18px; }
         .nav-btn.active {
             color: #2ec4b6;
         }
@@ -178,7 +179,7 @@
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
-            <p style="font-size: 12px; color: #666; margin-bottom: 10px;">都道府県をタップすると、その地域の思い出画面に移動します！</p>
+            <p style="font-size: 11px; color: #666; margin-bottom: 8px;">都道府県をタップすると、その地域の思い出画面に移動します！</p>
             
             <svg class="japan-map" viewBox="0 0 600 600">
                 <path id="hokkaido" class="pref" d="M480,40 L530,30 L560,70 L520,110 L470,90 Z" onclick="goToMemory('hokkaido')"></path>
@@ -337,7 +338,7 @@
 
         <div class="container" id="memoryArea">
             <h3 id="viewTitle">思い出</h3>
-            <p style="color: #666; font-size: 14px;">上のメニューから都道府県を選んでね！</p>
+            <p style="color: #666; font-size: 13px;">上のメニューから都道府県を選んでね！</p>
         </div>
     </div>
 
@@ -395,7 +396,6 @@
             fukuoka: "福岡県", saga: "佐賀県", nagasaki: "長崎県", kumamoto: "熊本県", oita: "大分県", miyazaki: "宮崎県", kagoshima: "鹿児島県", okinawa: "沖縄県"
         };
 
-        // スマホの保存機能からデータを読み込む
         let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
 
         function saveMemories() {
@@ -474,8 +474,8 @@
             if (list.length === 0) {
                 area.innerHTML = `
                     <h3>📍 ${prefName}の思い出</h3>
-                    <p style="color:#888;">この地域の思い出はまだ登録されていません。</p>
-                    <button class="submit-btn" style="margin-top:10px; background:#2ec4b6;" onclick="openAddForPref('${prefKey}')">この地域の思い出を追加する ➕</button>
+                    <p style="color:#888; font-size:13px;">この地域の思い出はまだ登録されていません。</p>
+                    <button class="submit-btn" style="margin-top:8px; background:#2ec4b6; font-size:13px; padding:8px;" onclick="openAddForPref('${prefKey}')">この地域の思い出を追加する ➕</button>
                 `;
                 return;
             }
@@ -488,16 +488,16 @@
                         photoTags += `<a href="${photoSrc}" target="_blank"><img src="${photoSrc}" alt="思い出の写真"></a>`;
                     });
                 } else {
-                    photoTags = '<p style="color:#888; font-size:13px;">写真なし</p>';
+                    photoTags = '<p style="color:#888; font-size:12px;">写真なし</p>';
                 }
 
                 cardsHtml += `
                     <div class="memory-card">
                         <h3>📍 ${item.title}</h3>
-                        <p style="font-size:13px; margin: 4px 0;"><strong>訪問時期:</strong> ${item.date || '未設定'}</p>
-                        <p style="font-size:13px; margin: 4px 0;"><strong>ひとことメモ:</strong> ${item.comment || 'なし'}</p>
+                        <p style="font-size:12px; margin: 3px 0;"><strong>訪問時期:</strong> ${item.date || '未設定'}</p>
+                        <p style="font-size:12px; margin: 3px 0;"><strong>ひとことメモ:</strong> ${item.comment || 'なし'}</p>
                         <div class="gallery">${photoTags}</div>
-                        <button class="delete-btn" onclick="deleteSingleMemory('${prefKey}', ${item.id})">🗑️ この思い出を削除</button>
+                        <button class="delete-btn" onclick="deleteSingleMemory('${prefKey}', ${item.id})">🗑️ 削除</button>
                     </div>
                 `;
             });
@@ -505,7 +505,7 @@
             area.innerHTML = `
                 <h3>📍 ${prefName}の思い出（全 ${list.length} 件）</h3>
                 ${cardsHtml}
-                <button class="submit-btn" style="margin-top:10px; background:#2ec4b6;" onclick="openAddForPref('${prefKey}')">さらに追加する ➕</button>
+                <button class="submit-btn" style="margin-top:8px; background:#2ec4b6; font-size:13px; padding:8px;" onclick="openAddForPref('${prefKey}')">さらに追加する ➕</button>
             `;
         }
 
@@ -592,7 +592,6 @@
             }
         }
 
-        // アプリ起動時に初期化を実行
         window.onload = function() {
             initApp();
         };
