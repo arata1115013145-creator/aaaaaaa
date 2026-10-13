@@ -80,7 +80,7 @@
             border: none;
         }
 
-        /* 📸 写真アルバム風：横スクロールギャラリー */
+        /* 📸 通常時の横スクロールギャラリー */
         .gallery {
             display: flex;
             gap: 8px;
@@ -100,7 +100,7 @@
             cursor: pointer;
         }
 
-        /* 🔍 拡大表示（背景をしっかり真っ黒にし、その中でも横スクロールできるように変更） */
+        /* 🔍 iPhoneの写真アプリ風ライトボックス（全画面黒背景） */
         #lightbox {
             display: none;
             position: fixed;
@@ -108,38 +108,73 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.95); /* 背景をさらに黒く変更 */
+            background-color: rgba(0, 0, 0, 0.95);
             z-index: 9999;
-            align-items: center;
-            overflow-x: auto; /* 拡大表示したまま横にスワイプして次の写真を見られるように設定 */
-            white-space: nowrap;
-            padding: 20px;
+            flex-direction: column;
+            justify-content: space-between;
             box-sizing: border-box;
-            -webkit-overflow-scrolling: touch;
+            padding: 20px 0;
         }
-        #lightbox img {
-            display: inline-block;
-            max-width: 90vw;
-            max-height: 85vh;
-            object-fit: contain;
-            border-radius: 6px;
-            margin-right: 15px;
-            vertical-align: middle;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.8);
-        }
+        
         /* 閉じるボタン */
+        .lightbox-header {
+            text-align: right;
+            padding: 0 20px;
+        }
         .lightbox-close {
-            position: fixed;
-            top: 15px;
-            right: 20px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
-            font-size: 18px;
-            padding: 8px 14px;
+            font-size: 14px;
+            padding: 6px 14px;
             border-radius: 20px;
             cursor: pointer;
-            z-index: 10000;
+        }
+
+        /* メインの拡大表示エリア（横スワイプで次々見られる） */
+        .lightbox-main {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            align-items: center;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* スクロールバーを隠す */
+        }
+        .lightbox-main::-webkit-scrollbar {
+            display: none;
+        }
+        .lightbox-main img {
+            flex-shrink: 0;
+            width: 100vw;
+            max-height: 70vh;
+            object-fit: contain;
+            scroll-snap-align: center;
+        }
+
+        /* 下部のサムネイル一覧（動画にあったようなパーツ） */
+        .lightbox-thumbs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 20px;
+            justify-content: center;
+            -webkit-overflow-scrolling: touch;
+        }
+        .lightbox-thumbs img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            opacity: 0.5;
+            cursor: pointer;
+            border: 2px solid transparent;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .lightbox-thumbs img.active-thumb {
+            opacity: 1;
+            border-color: #ffffff;
         }
 
         .delete-btn {
@@ -418,10 +453,17 @@
         </div>
     </div>
 
-    <!-- 写真を大きく表示するポップアップ（ライトボックス：横スクロール対応版） -->
+    <!-- 🔍 iPhoneの写真アプリ風ライトボックス -->
     <div id="lightbox">
-        <button class="lightbox-close" onclick="closeLightbox()">✕ 閉じる</button>
-        <div id="lightbox-content" style="display:inline-block; white-space:nowrap; height:100%; line-height:100vh;"></div>
+        <div class="lightbox-header">
+            <button class="lightbox-close" onclick="closeLightbox()">✕ 閉じる</button>
+        </div>
+        <div class="lightbox-main" id="lightbox-main" onscroll="onLightboxScroll()">
+            <!-- メインの拡大画像がここに横並びで入ります -->
+        </div>
+        <div class="lightbox-thumbs" id="lightbox-thumbs">
+            <!-- 下部のサムネイル一覧がここに入ります -->
+        </div>
     </div>
 
     <!-- 画面下部のタブバー -->
@@ -449,6 +491,7 @@
         };
 
         let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
+        let currentPhotosArray = [];
 
         function saveMemories() {
             localStorage.setItem('travel_memories', JSON.stringify(memories));
@@ -536,7 +579,6 @@
             list.forEach((item) => {
                 let photoTags = '';
                 if (item.photos && item.photos.length > 0) {
-                    // ひとつの思い出にある全写真を配列として渡せるようにJSON文字列化して渡す
                     const photosJson = JSON.stringify(item.photos).replace(/"/g, '&quot;');
                     item.photos.forEach((photoSrc, index) => {
                         photoTags += `<img src="${photoSrc}" alt="思い出の写真" onclick="openLightbox(${photosJson}, ${index})">`;
@@ -563,31 +605,72 @@
             `;
         }
 
-        // 🔍 拡大表示（横スクロールで次の写真を見られるように全写真を並べる）
+        // 🔍 iPhoneの写真アプリ風ライトボックスを開く
         function openLightbox(photosArray, startIndex) {
+            currentPhotosArray = photosArray;
             const lightbox = document.getElementById('lightbox');
-            const content = document.getElementById('lightbox-content');
+            const mainContainer = document.getElementById('lightbox-main');
+            const thumbsContainer = document.getElementById('lightbox-thumbs');
             
-            content.innerHTML = '';
-            photosArray.forEach(src => {
-                content.innerHTML += `<img src="${src}" alt="拡大写真">`;
+            mainContainer.innerHTML = '';
+            thumbsContainer.innerHTML = '';
+
+            photosArray.forEach((src, idx) => {
+                mainContainer.innerHTML += `<img src="${src}" alt="拡大写真">`;
+                thumbsContainer.innerHTML += `<img src="${src}" alt="サムネイル" id="thumb-${idx}" onclick="scrollToImage(${idx})">`;
             });
 
-            lightbox.style.display = 'block';
+            lightbox.style.display = 'flex';
 
-            // 最初にタップされた写真の位置まで一瞬でスクロールを合わせる
+            // 指定された写真の位置に即座に合わせる
             setTimeout(() => {
-                const imgs = content.getElementsByTagName('img');
-                if (imgs[startIndex]) {
-                    lightbox.scrollLeft = imgs[startIndex].offsetLeft - (lightbox.clientWidth - imgs[startIndex].clientWidth) / 2;
-                }
+                scrollToImage(startIndex, false);
             }, 50);
+        }
+
+        // 🔍 特定の写真へスクロールする
+        function scrollToImage(index, smooth = true) {
+            const mainContainer = document.getElementById('lightbox-main');
+            const imgs = mainContainer.getElementsByTagName('img');
+            if (imgs[index]) {
+                imgs[index].scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', inline: 'center', block: 'nearest' });
+            }
+            updateActiveThumb(index);
+        }
+
+        // 🔍 メイン画像をスワイプしたときに下のサムネイルのハイライトを連動させる
+        function onLightboxScroll() {
+            const mainContainer = document.getElementById('lightbox-main');
+            const imgs = mainContainer.getElementsByTagName('img');
+            let closestIndex = 0;
+            let minDistance = Infinity;
+
+            for (let i = 0; i < imgs.length; i++) {
+                const distance = Math.abs(imgs[i].getBoundingClientRect().left - mainContainer.clientWidth / 2);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = i;
+                }
+            }
+            updateActiveThumb(closestIndex);
+        }
+
+        // 🔍 下部サムネイルのアクティブ状態を更新
+        function updateActiveThumb(index) {
+            const thumbs = document.getElementById('lightbox-thumbs').getElementsByTagName('img');
+            for (let i = 0; i < thumbs.length; i++) {
+                if (i === index) {
+                    thumbs[i].classList.add('active-thumb');
+                    thumbs[i].scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+                } else {
+                    thumbs[i].classList.remove('active-thumb');
+                }
+            }
         }
 
         // 🔍 拡大表示を閉じる
         function closeLightbox() {
-            const lightbox = document.getElementById('lightbox');
-            lightbox.style.display = 'none';
+            document.getElementById('lightbox').style.display = 'none';
         }
 
         function openAddForPref(prefKey) {
