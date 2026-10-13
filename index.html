@@ -40,7 +40,6 @@
         }
         .container h3 { margin-top: 0; margin-bottom: 8px; color: #2c3e50; font-size: 15px; border-bottom: 2px solid #2ec4b6; padding-bottom: 4px; }
 
-        /* スマホ画面に綺麗に収まるように地図の最大サイズをコンパクトに調整 */
         .japan-map {
             width: 100%;
             max-width: 320px;
@@ -101,7 +100,7 @@
             cursor: pointer;
         }
 
-        /* 🔍 写真を画面いっぱいに拡大表示するモーダル画面のスタイル */
+        /* 🔍 拡大表示（背景をしっかり真っ黒にし、その中でも横スクロールできるように変更） */
         #lightbox {
             display: none;
             position: fixed;
@@ -109,19 +108,38 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
+            background-color: rgba(0, 0, 0, 0.95); /* 背景をさらに黒く変更 */
             z-index: 9999;
-            justify-content: center;
             align-items: center;
+            overflow-x: auto; /* 拡大表示したまま横にスワイプして次の写真を見られるように設定 */
+            white-space: nowrap;
             padding: 20px;
             box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
         }
         #lightbox img {
-            max-width: 100%;
-            max-height: 100%;
+            display: inline-block;
+            max-width: 90vw;
+            max-height: 85vh;
             object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border-radius: 6px;
+            margin-right: 15px;
+            vertical-align: middle;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.8);
+        }
+        /* 閉じるボタン */
+        .lightbox-close {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 18px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 10000;
         }
 
         .delete-btn {
@@ -400,9 +418,10 @@
         </div>
     </div>
 
-    <!-- 写真を拡大表示するポップアップ（ライトボックス） -->
-    <div id="lightbox" onclick="closeLightbox()">
-        <img id="lightbox-img" src="" alt="拡大写真">
+    <!-- 写真を大きく表示するポップアップ（ライトボックス：横スクロール対応版） -->
+    <div id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">✕ 閉じる</button>
+        <div id="lightbox-content" style="display:inline-block; white-space:nowrap; height:100%; line-height:100vh;"></div>
     </div>
 
     <!-- 画面下部のタブバー -->
@@ -517,9 +536,10 @@
             list.forEach((item) => {
                 let photoTags = '';
                 if (item.photos && item.photos.length > 0) {
-                    item.photos.forEach(photoSrc => {
-                        // 写真をタップすると大きく表示されるように変更
-                        photoTags += `<img src="${photoSrc}" alt="思い出の写真" onclick="openLightbox('${photoSrc}')">`;
+                    // ひとつの思い出にある全写真を配列として渡せるようにJSON文字列化して渡す
+                    const photosJson = JSON.stringify(item.photos).replace(/"/g, '&quot;');
+                    item.photos.forEach((photoSrc, index) => {
+                        photoTags += `<img src="${photoSrc}" alt="思い出の写真" onclick="openLightbox(${photosJson}, ${index})">`;
                     });
                 } else {
                     photoTags = '<p style="color:#888; font-size:12px;">写真なし</p>';
@@ -543,15 +563,28 @@
             `;
         }
 
-        // 🔍 写真を拡大表示する関数
-        function openLightbox(imgSrc) {
+        // 🔍 拡大表示（横スクロールで次の写真を見られるように全写真を並べる）
+        function openLightbox(photosArray, startIndex) {
             const lightbox = document.getElementById('lightbox');
-            const lightboxImg = document.getElementById('lightbox-img');
-            lightboxImg.src = imgSrc;
-            lightbox.style.display = 'flex';
+            const content = document.getElementById('lightbox-content');
+            
+            content.innerHTML = '';
+            photosArray.forEach(src => {
+                content.innerHTML += `<img src="${src}" alt="拡大写真">`;
+            });
+
+            lightbox.style.display = 'block';
+
+            // 最初にタップされた写真の位置まで一瞬でスクロールを合わせる
+            setTimeout(() => {
+                const imgs = content.getElementsByTagName('img');
+                if (imgs[startIndex]) {
+                    lightbox.scrollLeft = imgs[startIndex].offsetLeft - (lightbox.clientWidth - imgs[startIndex].clientWidth) / 2;
+                }
+            }, 50);
         }
 
-        // 🔍 拡大表示を閉じる関数
+        // 🔍 拡大表示を閉じる
         function closeLightbox() {
             const lightbox = document.getElementById('lightbox');
             lightbox.style.display = 'none';
