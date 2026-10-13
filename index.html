@@ -40,7 +40,7 @@
         }
         .container h3 { margin-top: 0; margin-bottom: 4px; color: #2c3e50; font-size: 13px; border-bottom: 2px solid #2ec4b6; padding-bottom: 2px; }
 
-        /* 🗺️ 指二本でズーム＆スワイプできる地図コンテナ */
+        /* 🗺️ 地図コンテナ */
         .map-container {
             position: relative;
             width: 100%;
@@ -51,7 +51,7 @@
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             background: #f8fafc;
-            touch-action: none; /* ブラウザ標準のズームやスクロールを無効化し、カスタム操作を有効にする */
+            touch-action: none;
             cursor: grab;
         }
         .map-container:active {
@@ -59,8 +59,7 @@
         }
 
         .japan-map {
-            width: 100%;
-            max-width: 340px;
+            width: 340px;
             height: auto;
             display: block;
             transform-origin: 0 0;
@@ -279,9 +278,9 @@
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">地図の上で指二本でピンチ（広げる・縮める）して拡大・縮小できます！</p>
+            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">指二本でピンチして拡大・縮小、指一本で動かせます！</p>
             
-            <!-- 🔍 指二本ズーム対応の地図コンテナ -->
+            <!-- 🔍 制限・ズーム対応の地図コンテナ -->
             <div class="map-container" id="mapContainer">
                 <svg class="japan-map" id="japanMap" viewBox="0 0 540 540">
                     <!-- 北海道・東北 -->
@@ -517,26 +516,49 @@
         let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
         let currentPhotosArray = [];
 
-        // 🗺️ 地図のズーム・ドラッグ移動を管理する変数
+        // 🗺️ ズーム・移動制御
         let scale = 1;
-        let panning = false;
         let pointX = 0;
         let pointY = 0;
         let startX = 0;
         let startY = 0;
+        let panning = false;
         let lastTouchDistance = 0;
 
         const mapContainer = document.getElementById('mapContainer');
         const japanMap = document.getElementById('japanMap');
 
         function setMapTransform() {
-            // スケール制限（1倍〜3.5倍）
             if (scale < 1) scale = 1;
             if (scale > 3.5) scale = 3.5;
+
+            const containerW = mapContainer.clientWidth;
+            const containerH = mapContainer.clientHeight;
+            const mapW = 340 * scale;
+            const mapH = 340 * scale; // ベースサイズに合わせる
+
+            // はみ出しすぎないための移動制限（境界）
+            const minX = containerW - mapW;
+            const minY = containerH - mapH;
+
+            if (mapW <= containerW) {
+                pointX = (containerW - mapW) / 2;
+            } else {
+                if (pointX > 0) pointX = 0;
+                if (pointX < minX) pointX = minX;
+            }
+
+            if (mapH <= containerH) {
+                pointY = (containerH - mapH) / 2;
+            } else {
+                if (pointY > 0) pointY = 0;
+                if (pointY < minY) pointY = minY;
+            }
+
             japanMap.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
         }
 
-        // マウスドラッグ（PC用）
+        // マウス操作（PC）
         mapContainer.addEventListener('mousedown', (e) => {
             e.preventDefault();
             panning = true;
@@ -555,7 +577,7 @@
             panning = false;
         });
 
-        // タッチ操作（スマホの指一本で移動、指二本でピンチズーム）
+        // タッチ操作（スマホ）
         mapContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 panning = true;
@@ -858,6 +880,7 @@
 
         window.onload = function() {
             initApp();
+            setMapTransform();
         };
     </script>
 
