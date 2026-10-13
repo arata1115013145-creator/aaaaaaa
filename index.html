@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- user-scalable=yesにして、ピンチイン・アウトでのズームを有効化 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>日本地図 旅行の思い出アルバム</title>
 
     <!-- スマホのホーム画面から開いたときにブラウザの枠を消す設定 -->
@@ -40,12 +41,22 @@
         }
         .container h3 { margin-top: 0; margin-bottom: 4px; color: #2c3e50; font-size: 13px; border-bottom: 2px solid #2ec4b6; padding-bottom: 2px; }
 
-        /* 🗺️ 日本地図を大きく、中央に綺麗に収める */
+        /* 🗺️ 地図エリアをスクロール・ズーム対応のコンテナで囲む */
+        .map-wrapper {
+            width: 100%;
+            max-width: 360px;
+            height: 380px;
+            margin: 0 auto;
+            overflow: auto; /* 拡大したときにスクロールできるようにする */
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            background: #f8fafc;
+            -webkit-overflow-scrolling: touch;
+        }
         .japan-map {
             width: 100%;
-            max-width: 350px; 
+            min-width: 340px;
             height: auto;
-            margin: 0 auto;
             display: block;
         }
         .pref {
@@ -260,156 +271,159 @@
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">都道府県をタップすると、その地域の思い出画面に移動します！</p>
+            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">地図をピンチ（二本指で広げる）して拡大できます！</p>
             
-            <svg class="japan-map" viewBox="0 0 540 540">
-                <!-- 北海道・東北 -->
-                <path id="hokkaido" class="pref" d="M420,30 L470,20 L500,60 L460,100 L410,80 Z" onclick="goToMemory('hokkaido')"></path>
-                <text x="455" y="62" class="pref-label">北海道</text>
+            <!-- ズーム・スクロールできるエリア -->
+            <div class="map-wrapper">
+                <svg class="japan-map" viewBox="0 0 540 540">
+                    <!-- 北海道・東北 -->
+                    <path id="hokkaido" class="pref" d="M420,30 L470,20 L500,60 L460,100 L410,80 Z" onclick="goToMemory('hokkaido')"></path>
+                    <text x="455" y="62" class="pref-label">北海道</text>
 
-                <path id="aomori" class="pref" d="M380,110 L420,100 L425,130 L375,130 Z" onclick="goToMemory('aomori')"></path>
-                <text x="400" y="118" class="pref-label">青森</text>
+                    <path id="aomori" class="pref" d="M380,110 L420,100 L425,130 L375,130 Z" onclick="goToMemory('aomori')"></path>
+                    <text x="400" y="118" class="pref-label">青森</text>
 
-                <path id="iwate" class="pref" d="M405,135 L435,135 L430,185 L390,175 Z" onclick="goToMemory('iwate')"></path>
-                <text x="415" y="158" class="pref-label">岩手</text>
+                    <path id="iwate" class="pref" d="M405,135 L435,135 L430,185 L390,175 Z" onclick="goToMemory('iwate')"></path>
+                    <text x="415" y="158" class="pref-label">岩手</text>
 
-                <path id="akita" class="pref" d="M375,135 L400,135 L390,185 L365,175 Z" onclick="goToMemory('akita')"></path>
-                <text x="382" y="158" class="pref-label">秋田</text>
+                    <path id="akita" class="pref" d="M375,135 L400,135 L390,185 L365,175 Z" onclick="goToMemory('akita')"></path>
+                    <text x="382" y="158" class="pref-label">秋田</text>
 
-                <path id="yamagata" class="pref" d="M365,180 L390,185 L385,220 L355,210 Z" onclick="goToMemory('yamagata')"></path>
-                <text x="372" y="198" class="pref-label">山形</text>
+                    <path id="yamagata" class="pref" d="M365,180 L390,185 L385,220 L355,210 Z" onclick="goToMemory('yamagata')"></path>
+                    <text x="372" y="198" class="pref-label">山形</text>
 
-                <path id="miyagi" class="pref" d="M395,185 L430,185 L420,225 L385,220 Z" onclick="goToMemory('miyagi')"></path>
-                <text x="407" y="203" class="pref-label">宮城</text>
+                    <path id="miyagi" class="pref" d="M395,185 L430,185 L420,225 L385,220 Z" onclick="goToMemory('miyagi')"></path>
+                    <text x="407" y="203" class="pref-label">宮城</text>
 
-                <path id="fukushima" class="pref" d="M360,225 L420,225 L415,265 L355,260 Z" onclick="goToMemory('fukushima')"></path>
-                <text x="387" y="244" class="pref-label">福島</text>
+                    <path id="fukushima" class="pref" d="M360,225 L420,225 L415,265 L355,260 Z" onclick="goToMemory('fukushima')"></path>
+                    <text x="387" y="244" class="pref-label">福島</text>
 
-                <!-- 関東 -->
-                <path id="ibaraki" class="pref" d="M395,270 L425,270 L420,305 L390,300 Z" onclick="goToMemory('ibaraki')"></path>
-                <text x="407" y="286" class="pref-label">茨城</text>
+                    <!-- 関東 -->
+                    <path id="ibaraki" class="pref" d="M395,270 L425,270 L420,305 L390,300 Z" onclick="goToMemory('ibaraki')"></path>
+                    <text x="407" y="286" class="pref-label">茨城</text>
 
-                <path id="tochigi" class="pref" d="M365,265 L390,265 L388,300 L362,295 Z" onclick="goToMemory('tochigi')"></path>
-                <text x="375" y="281" class="pref-label">栃木</text>
+                    <path id="tochigi" class="pref" d="M365,265 L390,265 L388,300 L362,295 Z" onclick="goToMemory('tochigi')"></path>
+                    <text x="375" y="281" class="pref-label">栃木</text>
 
-                <path id="gunma" class="pref" d="M335,265 L360,265 L358,295 L332,290 Z" onclick="goToMemory('gunma')"></path>
-                <text x="345" y="278" class="pref-label">群馬</text>
+                    <path id="gunma" class="pref" d="M335,265 L360,265 L358,295 L332,290 Z" onclick="goToMemory('gunma')"></path>
+                    <text x="345" y="278" class="pref-label">群馬</text>
 
-                <path id="saitama" class="pref" d="M350,300 L385,300 L382,320 L348,315 Z" onclick="goToMemory('saitama')"></path>
-                <text x="365" y="309" class="pref-label">埼玉</text>
+                    <path id="saitama" class="pref" d="M350,300 L385,300 L382,320 L348,315 Z" onclick="goToMemory('saitama')"></path>
+                    <text x="365" y="309" class="pref-label">埼玉</text>
 
-                <path id="chiba" class="pref" d="M395,310 L425,310 L415,355 L385,340 Z" onclick="goToMemory('chiba')"></path>
-                <text x="402" y="330" class="pref-label">千葉</text>
+                    <path id="chiba" class="pref" d="M395,310 L425,310 L415,355 L385,340 Z" onclick="goToMemory('chiba')"></path>
+                    <text x="402" y="330" class="pref-label">千葉</text>
 
-                <path id="tokyo" class="pref" d="M355,322 L380,322 L378,338 L352,335 Z" onclick="goToMemory('tokyo')"></path>
-                <text x="365" y="329" class="pref-label">東京</text>
+                    <path id="tokyo" class="pref" d="M355,322 L380,322 L378,338 L352,335 Z" onclick="goToMemory('tokyo')"></path>
+                    <text x="365" y="329" class="pref-label">東京</text>
 
-                <path id="kanagawa" class="pref" d="M352,342 L378,342 L375,360 L350,355 Z" onclick="goToMemory('kanagawa')"></path>
-                <text x="363" y="350" class="pref-label">神奈川</text>
+                    <path id="kanagawa" class="pref" d="M352,342 L378,342 L375,360 L350,355 Z" onclick="goToMemory('kanagawa')"></path>
+                    <text x="363" y="350" class="pref-label">神奈川</text>
 
-                <!-- 北陸・中部 -->
-                <path id="niigata" class="pref" d="M320,200 L355,200 L365,255 L315,245 Z" onclick="goToMemory('niigata')"></path>
-                <text x="340" y="223" class="pref-label">新潟</text>
+                    <!-- 北陸・中部 -->
+                    <path id="niigata" class="pref" d="M320,200 L355,200 L365,255 L315,245 Z" onclick="goToMemory('niigata')"></path>
+                    <text x="340" y="223" class="pref-label">新潟</text>
 
-                <path id="toyama" class="pref" d="M285,255 L310,255 L308,275 L282,270 Z" onclick="goToMemory('toyama')"></path>
-                <text x="295" y="264" class="pref-label">富山</text>
+                    <path id="toyama" class="pref" d="M285,255 L310,255 L308,275 L282,270 Z" onclick="goToMemory('toyama')"></path>
+                    <text x="295" y="264" class="pref-label">富山</text>
 
-                <path id="ishikawa" class="pref" d="M265,235 L285,235 L290,275 L270,270 Z" onclick="goToMemory('ishikawa')"></path>
-                <text x="277" y="253" class="pref-label">石川</text>
+                    <path id="ishikawa" class="pref" d="M265,235 L285,235 L290,275 L270,270 Z" onclick="goToMemory('ishikawa')"></path>
+                    <text x="277" y="253" class="pref-label">石川</text>
 
-                <path id="fukui" class="pref" d="M260,275 L282,275 L280,305 L258,300 Z" onclick="goToMemory('fukui')"></path>
-                <text x="270" y="289" class="pref-label">福井</text>
+                    <path id="fukui" class="pref" d="M260,275 L282,275 L280,305 L258,300 Z" onclick="goToMemory('fukui')"></path>
+                    <text x="270" y="289" class="pref-label">福井</text>
 
-                <path id="yamanashi" class="pref" d="M325,300 L348,300 L345,325 L322,320 Z" onclick="goToMemory('yamanashi')"></path>
-                <text x="335" y="311" class="pref-label">山梨</text>
+                    <path id="yamanashi" class="pref" d="M325,300 L348,300 L345,325 L322,320 Z" onclick="goToMemory('yamanashi')"></path>
+                    <text x="335" y="311" class="pref-label">山梨</text>
 
-                <path id="nagano" class="pref" d="M320,255 L348,255 L345,298 L318,295 Z" onclick="goToMemory('nagano')"></path>
-                <text x="332" y="275" class="pref-label">長野</text>
+                    <path id="nagano" class="pref" d="M320,255 L348,255 L345,298 L318,295 Z" onclick="goToMemory('nagano')"></path>
+                    <text x="332" y="275" class="pref-label">長野</text>
 
-                <path id="gifu" class="pref" d="M285,280 L315,280 L312,325 L282,320 Z" onclick="goToMemory('gifu')"></path>
-                <text x="298" y="301" class="pref-label">岐阜</text>
+                    <path id="gifu" class="pref" d="M285,280 L315,280 L312,325 L282,320 Z" onclick="goToMemory('gifu')"></path>
+                    <text x="298" y="301" class="pref-label">岐阜</text>
 
-                <path id="shizuoka" class="pref" d="M350,330 L382,330 L378,365 L335,355 Z" onclick="goToMemory('shizuoka')"></path>
-                <text x="357" y="346" class="pref-label">静岡</text>
+                    <path id="shizuoka" class="pref" d="M350,330 L382,330 L378,365 L335,355 Z" onclick="goToMemory('shizuoka')"></path>
+                    <text x="357" y="346" class="pref-label">静岡</text>
 
-                <path id="aichi" class="pref" d="M315,330 L338,330 L335,362 L312,358 Z" onclick="goToMemory('aichi')"></path>
-                <text x="325" y="345" class="pref-label">愛知</text>
+                    <path id="aichi" class="pref" d="M315,330 L338,330 L335,362 L312,358 Z" onclick="goToMemory('aichi')"></path>
+                    <text x="325" y="345" class="pref-label">愛知</text>
 
-                <!-- 関西 -->
-                <path id="mie" class="pref" d="M295,335 L312,335 L310,380 L290,370 Z" onclick="goToMemory('mie')"></path>
-                <text x="301" y="356" class="pref-label">三重</text>
+                    <!-- 関西 -->
+                    <path id="mie" class="pref" d="M295,335 L312,335 L310,380 L290,370 Z" onclick="goToMemory('mie')"></path>
+                    <text x="301" y="356" class="pref-label">三重</text>
 
-                <path id="shiga" class="pref" d="M268,310 L285,310 L283,340 L265,335 Z" onclick="goToMemory('shiga')"></path>
-                <text x="275" y="324" class="pref-label">滋賀</text>
+                    <path id="shiga" class="pref" d="M268,310 L285,310 L283,340 L265,335 Z" onclick="goToMemory('shiga')"></path>
+                    <text x="275" y="324" class="pref-label">滋賀</text>
 
-                <path id="kyoto" class="pref" d="M248,305 L265,305 L262,345 L245,340 Z" onclick="goToMemory('kyoto')"></path>
-                <text x="255" y="324" class="pref-label">京都</text>
+                    <path id="kyoto" class="pref" d="M248,305 L265,305 L262,345 L245,340 Z" onclick="goToMemory('kyoto')"></path>
+                    <text x="255" y="324" class="pref-label">京都</text>
 
-                <path id="osaka" class="pref" d="M245,348 L262,348 L260,370 L242,365 Z" onclick="goToMemory('osaka')"></path>
-                <text x="252" y="358" class="pref-label">大阪</text>
+                    <path id="osaka" class="pref" d="M245,348 L262,348 L260,370 L242,365 Z" onclick="goToMemory('osaka')"></path>
+                    <text x="252" y="358" class="pref-label">大阪</text>
 
-                <path id="hyogo" class="pref" d="M220,305 L245,305 L242,355 L218,345 Z" onclick="goToMemory('hyogo')"></path>
-                <text x="230" y="329" class="pref-label">兵庫</text>
+                    <path id="hyogo" class="pref" d="M220,305 L245,305 L242,355 L218,345 Z" onclick="goToMemory('hyogo')"></path>
+                    <text x="230" y="329" class="pref-label">兵庫</text>
 
-                <path id="nara" class="pref" d="M265,348 L283,348 L280,375 L262,370 Z" onclick="goToMemory('nara')"></path>
-                <text x="272" y="360" class="pref-label">奈良</text>
+                    <path id="nara" class="pref" d="M265,348 L283,348 L280,375 L262,370 Z" onclick="goToMemory('nara')"></path>
+                    <text x="272" y="360" class="pref-label">奈良</text>
 
-                <path id="wakayama" class="pref" d="M250,375 L278,375 L275,410 L248,400 Z" onclick="goToMemory('wakayama')"></path>
-                <text x="262" y="391" class="pref-label">和歌山</text>
+                    <path id="wakayama" class="pref" d="M250,375 L278,375 L275,410 L248,400 Z" onclick="goToMemory('wakayama')"></path>
+                    <text x="262" y="391" class="pref-label">和歌山</text>
 
-                <!-- 中国・四国 -->
-                <path id="tottori" class="pref" d="M190,315 L215,315 L212,335 L188,330 Z" onclick="goToMemory('tottori')"></path>
-                <text x="201" y="324" class="pref-label">鳥取</text>
+                    <!-- 中国・四国 -->
+                    <path id="tottori" class="pref" d="M190,315 L215,315 L212,335 L188,330 Z" onclick="goToMemory('tottori')"></path>
+                    <text x="201" y="324" class="pref-label">鳥取</text>
 
-                <path id="shimane" class="pref" d="M150,315 L185,315 L182,338 L148,332 Z" onclick="goToMemory('shimane')"></path>
-                <text x="165" y="325" class="pref-label">島根</text>
+                    <path id="shimane" class="pref" d="M150,315 L185,315 L182,338 L148,332 Z" onclick="goToMemory('shimane')"></path>
+                    <text x="165" y="325" class="pref-label">島根</text>
 
-                <path id="okayama" class="pref" d="M190,340 L215,340 L212,365 L188,360 Z" onclick="goToMemory('okayama')"></path>
-                <text x="201" y="351" class="pref-label">岡山</text>
+                    <path id="okayama" class="pref" d="M190,340 L215,340 L212,365 L188,360 Z" onclick="goToMemory('okayama')"></path>
+                    <text x="201" y="351" class="pref-label">岡山</text>
 
-                <path id="hiroshima" class="pref" d="M160,342 L185,342 L182,370 L158,365 Z" onclick="goToMemory('hiroshima')"></path>
-                <text x="171" y="355" class="pref-label">広島</text>
+                    <path id="hiroshima" class="pref" d="M160,342 L185,342 L182,370 L158,365 Z" onclick="goToMemory('hiroshima')"></path>
+                    <text x="171" y="355" class="pref-label">広島</text>
 
-                <path id="yamaguchi" class="pref" d="M125,340 L152,340 L150,375 L122,368 Z" onclick="goToMemory('yamaguchi')"></path>
-                <text x="136" y="356" class="pref-label">山口</text>
+                    <path id="yamaguchi" class="pref" d="M125,340 L152,340 L150,375 L122,368 Z" onclick="goToMemory('yamaguchi')"></path>
+                    <text x="136" y="356" class="pref-label">山口</text>
 
-                <path id="tokushima" class="pref" d="M195,385 L220,385 L218,408 L192,402 Z" onclick="goToMemory('tokushima')"></path>
-                <text x="206" y="395" class="pref-label">徳島</text>
+                    <path id="tokushima" class="pref" d="M195,385 L220,385 L218,408 L192,402 Z" onclick="goToMemory('tokushima')"></path>
+                    <text x="206" y="395" class="pref-label">徳島</text>
 
-                <path id="kagawa" class="pref" d="M192,370 L218,370 L215,382 L190,380 Z" onclick="goToMemory('kagawa')"></path>
-                <text x="203" y="375" class="pref-label">香川</text>
+                    <path id="kagawa" class="pref" d="M192,370 L218,370 L215,382 L190,380 Z" onclick="goToMemory('kagawa')"></path>
+                    <text x="203" y="375" class="pref-label">香川</text>
 
-                <path id="ehime" class="pref" d="M162,380 L188,380 L185,410 L160,405 Z" onclick="goToMemory('ehime')"></path>
-                <text x="173" y="394" class="pref-label">愛媛</text>
+                    <path id="ehime" class="pref" d="M162,380 L188,380 L185,410 L160,405 Z" onclick="goToMemory('ehime')"></path>
+                    <text x="173" y="394" class="pref-label">愛媛</text>
 
-                <path id="kochi" class="pref" d="M165,415 L200,415 L195,438 L162,432 Z" onclick="goToMemory('kochi')"></path>
-                <text x="180" y="425" class="pref-label">高知</text>
+                    <path id="kochi" class="pref" d="M165,415 L200,415 L195,438 L162,432 Z" onclick="goToMemory('kochi')"></path>
+                    <text x="180" y="425" class="pref-label">高知</text>
 
-                <!-- 九州・沖縄 -->
-                <path id="fukuoka" class="pref" d="M85,370 L112,370 L110,395 L82,390 Z" onclick="goToMemory('fukuoka')"></path>
-                <text x="96" y="381" class="pref-label">福岡</text>
+                    <!-- 九州・沖縄 -->
+                    <path id="fukuoka" class="pref" d="M85,370 L112,370 L110,395 L82,390 Z" onclick="goToMemory('fukuoka')"></path>
+                    <text x="96" y="381" class="pref-label">福岡</text>
 
-                <path id="saga" class="pref" d="M65,380 L80,380 L78,402 L62,398 Z" onclick="goToMemory('saga')"></path>
-                <text x="71" y="390" class="pref-label">佐賀</text>
+                    <path id="saga" class="pref" d="M65,380 L80,380 L78,402 L62,398 Z" onclick="goToMemory('saga')"></path>
+                    <text x="71" y="390" class="pref-label">佐賀</text>
 
-                <path id="nagasaki" class="pref" d="M42,385 L60,385 L58,420 L40,415 Z" onclick="goToMemory('nagasaki')"></path>
-                <text x="50" y="401" class="pref-label">長崎</text>
+                    <path id="nagasaki" class="pref" d="M42,385 L60,385 L58,420 L40,415 Z" onclick="goToMemory('nagasaki')"></path>
+                    <text x="50" y="401" class="pref-label">長崎</text>
 
-                <path id="kumamoto" class="pref" d="M75,405 L102,405 L98,438 L72,432 Z" onclick="goToMemory('kumamoto')"></path>
-                <text x="87" y="420" class="pref-label">熊本</text>
+                    <path id="kumamoto" class="pref" d="M75,405 L102,405 L98,438 L72,432 Z" onclick="goToMemory('kumamoto')"></path>
+                    <text x="87" y="420" class="pref-label">熊本</text>
 
-                <path id="oita" class="pref" d="M108,390 L130,390 L128,420 L105,415 Z" onclick="goToMemory('oita')"></path>
-                <text x="117" y="404" class="pref-label">大分</text>
+                    <path id="oita" class="pref" d="M108,390 L130,390 L128,420 L105,415 Z" onclick="goToMemory('oita')"></path>
+                    <text x="117" y="404" class="pref-label">大分</text>
 
-                <path id="miyazaki" class="pref" d="M100,428 L122,428 L118,462 L98,455 Z" onclick="goToMemory('miyazaki')"></path>
-                <text x="110" y="444" class="pref-label">宮崎</text>
+                    <path id="miyazaki" class="pref" d="M100,428 L122,428 L118,462 L98,455 Z" onclick="goToMemory('miyazaki')"></path>
+                    <text x="110" y="444" class="pref-label">宮崎</text>
 
-                <path id="kagoshima" class="pref" d="M75,445 L100,445 L95,480 L72,472 Z" onclick="goToMemory('kagoshima')"></path>
-                <text x="85" y="461" class="pref-label">鹿児島</text>
+                    <path id="kagoshima" class="pref" d="M75,445 L100,445 L95,480 L72,472 Z" onclick="goToMemory('kagoshima')"></path>
+                    <text x="85" y="461" class="pref-label">鹿児島</text>
 
-                <path id="okinawa" class="pref" d="M30,500 L65,500 L60,520 L28,515 Z" onclick="goToMemory('okinawa')"></path>
-                <text x="45" y="509" class="pref-label">沖縄</text>
-            </svg>
+                    <path id="okinawa" class="pref" d="M30,500 L65,500 L60,520 L28,515 Z" onclick="goToMemory('okinawa')"></path>
+                    <text x="45" y="509" class="pref-label">沖縄</text>
+                </svg>
+            </div>
         </div>
     </div>
 
