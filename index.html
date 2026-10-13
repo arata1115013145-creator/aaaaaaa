@@ -40,7 +40,7 @@
         }
         .container h3 { margin-top: 0; margin-bottom: 4px; color: #2c3e50; font-size: 13px; border-bottom: 2px solid #2ec4b6; padding-bottom: 2px; }
 
-        /* 🗺️ 指二本でズーム＆スワイプできる地図コンテナ */
+        /* 🗺️ 枠外に行かないように収める地図コンテナ */
         .map-container {
             position: relative;
             width: 100%;
@@ -51,7 +51,7 @@
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             background: #f8fafc;
-            touch-action: none; /* ブラウザ標準のズームやスクロールを無効化し、カスタム操作を有効にする */
+            touch-action: none;
             cursor: grab;
         }
         .map-container:active {
@@ -279,9 +279,9 @@
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">地図の上で指二本でピンチ（広げる・縮める）して拡大・縮小できます！</p>
+            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">指二本でピンチして拡大・縮小、指一本で動かせます！</p>
             
-            <!-- 🔍 指二本ズーム対応の地図コンテナ -->
+            <!-- 🔍 移動制限付きの地図コンテナ -->
             <div class="map-container" id="mapContainer">
                 <svg class="japan-map" id="japanMap" viewBox="0 0 540 540">
                     <!-- 北海道・東北 -->
@@ -517,13 +517,13 @@
         let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
         let currentPhotosArray = [];
 
-        // 🗺️ 地図のズーム・ドラッグ移動を管理する変数
+        // 🗺️ 地図のズーム・移動範囲制限を管理する変数
         let scale = 1;
-        let panning = false;
         let pointX = 0;
         let pointY = 0;
         let startX = 0;
         let startY = 0;
+        let panning = false;
         let lastTouchDistance = 0;
 
         const mapContainer = document.getElementById('mapContainer');
@@ -533,6 +533,29 @@
             // スケール制限（1倍〜3.5倍）
             if (scale < 1) scale = 1;
             if (scale > 3.5) scale = 3.5;
+
+            // 地図が画面外に行きすぎないように移動範囲（境界線）を計算して制限する
+            const containerWidth = mapContainer.clientWidth;
+            const containerHeight = mapContainer.clientHeight;
+            const mapWidth = japanMap.clientWidth * scale;
+            const mapHeight = japanMap.clientHeight * scale;
+
+            if (mapWidth <= containerWidth) {
+                pointX = (containerWidth - mapWidth) / 2;
+            } else {
+                const minX = containerWidth - mapWidth;
+                if (pointX > 0) pointX = 0;
+                if (pointX < minX) pointX = minX;
+            }
+
+            if (mapHeight <= containerHeight) {
+                pointY = (containerHeight - mapHeight) / 2;
+            } else {
+                const minY = containerHeight - mapHeight;
+                if (pointY > 0) pointY = 0;
+                if (pointY < minY) pointY = minY;
+            }
+
             japanMap.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
         }
 
@@ -790,7 +813,7 @@
             const commentInput = document.getElementById('prefComment');
             const fileInput = document.getElementById('prefPhotos');
 
-            if (!selectBox || !titleInput || !fileInput) return;
+            |if (!selectBox || !titleInput || !fileInput) return;
 
             const id = selectBox.value;
             const title = titleInput.value;
