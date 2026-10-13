@@ -278,9 +278,9 @@
     <div id="screen-map" class="screen active">
         <div class="container" style="text-align: center;">
             <h3>📍 日本マップ</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">指二本でピンチして拡大・縮小、指一本で動かせます！</p>
+            <p style="font-size: 11px; color: #666; margin-bottom: 4px;">指二本を置いた場所を中心にピンチズームできます！</p>
             
-            <!-- 🔍 制限・ズーム対応の地図コンテナ -->
+            <!-- 🔍 指の間の中心点ズーム対応の地図コンテナ -->
             <div class="map-container" id="mapContainer">
                 <svg class="japan-map" id="japanMap" viewBox="0 0 540 540">
                     <!-- 北海道・東北 -->
@@ -516,7 +516,7 @@
         let memories = JSON.parse(localStorage.getItem('travel_memories')) || {};
         let currentPhotosArray = [];
 
-        // 🗺️ ズーム・移動制御
+        // 🗺️ ズーム・中心点・移動制御
         let scale = 1;
         let pointX = 0;
         let pointY = 0;
@@ -524,20 +524,20 @@
         let startY = 0;
         let panning = false;
         let lastTouchDistance = 0;
+        let lastTouchCenter = { x: 0, y: 0 };
 
         const mapContainer = document.getElementById('mapContainer');
         const japanMap = document.getElementById('japanMap');
 
-        function setMapTransform() {
+        function applyTransform() {
             if (scale < 1) scale = 1;
             if (scale > 3.5) scale = 3.5;
 
             const containerW = mapContainer.clientWidth;
             const containerH = mapContainer.clientHeight;
             const mapW = 340 * scale;
-            const mapH = 340 * scale; // ベースサイズに合わせる
+            const mapH = 340 * scale;
 
-            // はみ出しすぎないための移動制限（境界）
             const minX = containerW - mapW;
             const minY = containerH - mapH;
 
@@ -570,14 +570,14 @@
             if (!panning) return;
             pointX = e.clientX - startX;
             pointY = e.clientY - startY;
-            setMapTransform();
+            applyTransform();
         });
 
         window.addEventListener('mouseup', () => {
             panning = false;
         });
 
-        // タッチ操作（スマホ）
+        // タッチ操作（スマホのピンチ中心ズーム＆移動）
         mapContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 panning = true;
@@ -589,6 +589,11 @@
                     e.touches[0].clientX - e.touches[1].clientX,
                     e.touches[0].clientY - e.touches[1].clientY
                 );
+                const rect = mapContainer.getBoundingClientRect();
+                lastTouchCenter = {
+                    x: (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left,
+                    y: (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top
+                };
             }
         }, { passive: false });
 
@@ -596,18 +601,32 @@
             if (panning && e.touches.length === 1) {
                 pointX = e.touches[0].clientX - startX;
                 pointY = e.touches[0].clientY - startY;
-                setMapTransform();
+                applyTransform();
             } else if (e.touches.length === 2) {
                 const currentDistance = Math.hypot(
                     e.touches[0].clientX - e.touches[1].clientX,
                     e.touches[0].clientY - e.touches[1].clientY
                 );
+                const rect = mapContainer.getBoundingClientRect();
+                const currentCenter = {
+                    x: (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left,
+                    y: (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top
+                };
+
                 if (lastTouchDistance > 0) {
                     const zoomFactor = currentDistance / lastTouchDistance;
-                    scale *= zoomFactor;
-                    setMapTransform();
+                    const newScale = scale * zoomFactor;
+
+                    if (newScale >= 1 && newScale <= 3.5) {
+                        // 二本指の真ん中を中心にズーム計算
+                        pointX = currentCenter.x - (currentCenter.x - pointX) * (newScale / scale);
+                        pointY = currentCenter.y - (currentCenter.y - pointY) * (newScale / scale);
+                        scale = newScale;
+                    }
                 }
                 lastTouchDistance = currentDistance;
+                lastTouchCenter = currentCenter;
+                applyTransform();
             }
             e.preventDefault();
         }, { passive: false });
@@ -880,7 +899,7 @@
 
         window.onload = function() {
             initApp();
-            setMapTransform();
+            applyTransform();
         };
     </script>
 
