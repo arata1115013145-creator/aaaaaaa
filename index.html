@@ -113,21 +113,22 @@
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
-            padding: 20px 0;
+            padding: 10px 0 20px 0;
         }
         
-        /* 閉じるボタン */
+        /* 閉じるボタン（位置を少し上に上げて写真と被らないように調整） */
         .lightbox-header {
             text-align: right;
             padding: 0 20px;
+            min-height: 35px;
         }
         .lightbox-close {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             color: white;
             border: none;
-            font-size: 14px;
-            padding: 6px 14px;
-            border-radius: 20px;
+            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 15px;
             cursor: pointer;
         }
 
@@ -139,7 +140,7 @@
             scroll-snap-type: x mandatory;
             align-items: center;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* スクロールバーを隠す */
+            scrollbar-width: none;
         }
         .lightbox-main::-webkit-scrollbar {
             display: none;
@@ -152,7 +153,7 @@
             scroll-snap-align: center;
         }
 
-        /* 下部のサムネイル一覧（動画にあったようなパーツ） */
+        /* 下部のサムネイル一覧 */
         .lightbox-thumbs {
             display: flex;
             gap: 8px;
@@ -605,7 +606,6 @@
             `;
         }
 
-        // 🔍 iPhoneの写真アプリ風ライトボックスを開く
         function openLightbox(photosArray, startIndex) {
             currentPhotosArray = photosArray;
             const lightbox = document.getElementById('lightbox');
@@ -622,13 +622,11 @@
 
             lightbox.style.display = 'flex';
 
-            // 指定された写真の位置に即座に合わせる
             setTimeout(() => {
                 scrollToImage(startIndex, false);
             }, 50);
         }
 
-        // 🔍 特定の写真へスクロールする
         function scrollToImage(index, smooth = true) {
             const mainContainer = document.getElementById('lightbox-main');
             const imgs = mainContainer.getElementsByTagName('img');
@@ -638,7 +636,6 @@
             updateActiveThumb(index);
         }
 
-        // 🔍 メイン画像をスワイプしたときに下のサムネイルのハイライトを連動させる
         function onLightboxScroll() {
             const mainContainer = document.getElementById('lightbox-main');
             const imgs = mainContainer.getElementsByTagName('img');
@@ -655,7 +652,6 @@
             updateActiveThumb(closestIndex);
         }
 
-        // 🔍 下部サムネイルのアクティブ状態を更新
         function updateActiveThumb(index) {
             const thumbs = document.getElementById('lightbox-thumbs').getElementsByTagName('img');
             for (let i = 0; i < thumbs.length; i++) {
@@ -668,7 +664,6 @@
             }
         }
 
-        // 🔍 拡大表示を閉じる
         function closeLightbox() {
             document.getElementById('lightbox').style.display = 'none';
         }
