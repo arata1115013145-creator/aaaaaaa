@@ -145,7 +145,6 @@
             animation: none;
         }
 
-        /* 🛠️ 調整モード中のピン表示 */
         .map-pin.dragging {
             background: rgba(255, 0, 0, 0.9) !important;
             border: 1.5px solid #fff !important;
@@ -160,7 +159,6 @@
             100% { box-shadow: 0 0 0 0 rgba(245, 159, 0, 0); }
         }
 
-        /* 🛠️ 調整ツールバー用スタイル */
         .debug-toolbar {
             background: #fff3cd;
             border: 1.5px solid #ffeeba;
@@ -209,7 +207,6 @@
             border: none;
         }
 
-        /* 📸 横スクロールギャラリー */
         .gallery {
             display: flex;
             gap: 6px;
@@ -229,7 +226,6 @@
             cursor: pointer;
         }
 
-        /* 💬 ポップアップ通知 */
         #comicToast {
             display: none;
             position: fixed;
@@ -268,7 +264,6 @@
             opacity: 1;
         }
 
-        /* 🔍 写真ライトボックス */
         #lightbox {
             display: none;
             position: fixed;
@@ -426,7 +421,6 @@
             transform: scale(1.1);
         }
 
-        /* 📱 下部ナビゲーションバー */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -477,21 +471,17 @@
 </head>
 <body>
 
-    <!-- ヘッダーエリア -->
     <div class="app-header">
         <h1>サクラ日記</h1>
     </div>
 
-    <!-- 💬 ポップアップ通知 -->
     <div id="comicToast">思い出が保存されました！</div>
 
-    <!-- 画面①：日本地図（ホーム） -->
     <div id="screen-map" class="screen active">
         <div class="map-card">
             <div class="section-title">日本地図</div>
             <div class="subtitle">思い出のある県は黄色のピンが光ります！ピンをタップしてね</div>
             
-            <!-- 🛠️ 座標調整用ツールバー -->
             <div class="debug-toolbar">
                 <span id="debugStatus">ピン調整モード: OFF</span>
                 <button class="debug-btn" onclick="toggleDebugMode()">モード切替</button>
@@ -500,14 +490,12 @@
             <div class="map-container" id="mapContainer">
                 <div class="map-wrapper" id="mapWrapper">
                     <img src="japan-map.png" alt="日本地図" class="map-image" id="japanMapImg">
-                    <!-- 都道府県のピンがJavaScriptでここに動的に配置されます -->
                 </div>
             </div>
             <div id="coordOutputBox"></div>
         </div>
     </div>
 
-    <!-- 画面②：思い出を見る画面 -->
     <div id="screen-view" class="screen">
         <div class="container">
             <h3>都道府県を選択</h3>
@@ -523,7 +511,6 @@
         </div>
     </div>
 
-    <!-- 画面③：思い出を追加する画面 -->
     <div id="screen-add" class="screen">
         <div class="container">
             <h3>新しい思い出を追加する</h3>
@@ -564,7 +551,6 @@
         </div>
     </div>
 
-    <!-- 画面④：思い出一覧画面 -->
     <div id="screen-all" class="screen">
         <div class="container">
             <h3>すべての思い出</h3>
@@ -580,7 +566,6 @@
         <div id="allMemoryArea"></div>
     </div>
 
-    <!-- 🔍 写真ライトボックス -->
     <div id="lightbox">
         <div class="lightbox-header">
             <button class="lightbox-close" onclick="closeLightbox()">✕ 閉じる</button>
@@ -589,7 +574,6 @@
         <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
     </div>
 
-    <!-- 📱 下部ナビゲーションバー -->
     <div class="nav-bar">
         <button class="nav-btn active" id="nav-map" onclick="switchScreen('map')">
             <svg viewBox="0 0 24 24"><path d="M9 18l-6-.5V6l6 .5M9 18l6-1.5m-6 1.5v-12l6 1.5m0 10.5l6-.5V5l-6 .5m0 12v-12"/></svg>
