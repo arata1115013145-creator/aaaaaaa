@@ -46,7 +46,7 @@
         .subtitle {
             font-size: 11px; 
             color: #263849; 
-            margin: 0 0 10px 0;
+            margin: 0 0 6px 0;
         }
 
         .screen {
@@ -77,7 +77,7 @@
             padding-bottom: 6px; 
         }
 
-        /* 🗺️ 日本地図コンテナ（余白を削ってぴったりサイズに調整） */
+        /* 🗺️ 日本地図コンテナ */
         .map-card {
             background: #fffef8;
             border-radius: 16px;
@@ -89,7 +89,7 @@
             position: relative;
             width: 100%;
             max-width: 320px;
-            height: 380px; /* 余分な下部余白をなくすため高さを調整 */
+            height: 370px;
             margin: 0 auto;
             overflow: hidden;
             border-radius: 12px;
@@ -122,9 +122,9 @@
         /* 🟡 小さくすっきりした黄色のピン */
         .map-pin {
             position: absolute;
-            width: 14px;
-            height: 14px;
-            background: rgba(255, 235, 59, 0.85);
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 235, 59, 0.9);
             border: 2px solid #f59f00;
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -133,29 +133,67 @@
             box-shadow: 0 0 6px rgba(245, 159, 0, 0.5);
             animation: pulsePin 2s infinite;
         }
-        .map-pin:hover, .map-pin:active {
+        .map-pin:hover {
             transform: translate(-50%, -50%) scale(1.4);
-            background: rgba(255, 235, 59, 1);
         }
         .map-pin.no-data {
-            background: rgba(150, 150, 150, 0.3);
-            border: 1.5px solid rgba(120, 120, 120, 0.6);
-            width: 10px;
-            height: 10px;
+            background: rgba(150, 150, 150, 0.4);
+            border: 1.5px solid rgba(120, 120, 120, 0.8);
+            width: 12px;
+            height: 12px;
             box-shadow: none;
             animation: none;
         }
-        .map-pin.no-data:hover, .map-pin.no-data:active {
-            background: rgba(255, 235, 59, 0.7);
-            border-color: #f59f00;
-            width: 14px;
-            height: 14px;
+
+        /* 🛠️ 調整モード中のピン表示 */
+        .map-pin.dragging {
+            background: rgba(255, 0, 0, 0.8) !important;
+            border: 2px solid #fff !important;
+            transform: translate(-50%, -50%) scale(1.6);
+            z-index: 1000;
+            animation: none;
         }
 
         @keyframes pulsePin {
             0% { box-shadow: 0 0 0 0 rgba(245, 159, 0, 0.4); }
             70% { box-shadow: 0 0 0 6px rgba(245, 159, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(245, 159, 0, 0); }
+        }
+
+        /* 🛠️ 調整ツールバー用スタイル */
+        .debug-toolbar {
+            background: #fff3cd;
+            border: 1.5px solid #ffeeba;
+            border-radius: 10px;
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #856404;
+        }
+        .debug-btn {
+            background: #856404;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        #coordOutputBox {
+            display: none;
+            margin-top: 6px;
+            background: #263849;
+            color: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            word-break: break-all;
+            text-align: left;
         }
 
         .memory-card {
@@ -453,12 +491,19 @@
             <div class="section-title">日本地図</div>
             <div class="subtitle">思い出のある県は黄色のピンが光ります！ピンをタップしてね</div>
             
+            <!-- 🛠️ 座標調整用ツールバー -->
+            <div class="debug-toolbar">
+                <span id="debugStatus">ピン調整モード: OFF</span>
+                <button class="debug-btn" onclick="toggleDebugMode()">モード切替</button>
+            </div>
+
             <div class="map-container" id="mapContainer">
                 <div class="map-wrapper" id="mapWrapper">
                     <img src="japan-map.png" alt="日本地図" class="map-image" id="japanMapImg">
                     <!-- 都道府県のピンがJavaScriptでここに動的に配置されます -->
                 </div>
             </div>
+            <div id="coordOutputBox"></div>
         </div>
     </div>
 
@@ -603,6 +648,16 @@
         let memories = {};
         let db = null;
         let selectedTitleColor = '#263849';
+        let isDebugMode = false;
+
+        function toggleDebugMode() {
+            isDebugMode = !isDebugMode;
+            const status = document.getElementById('debugStatus');
+            const outBox = document.getElementById('coordOutputBox');
+            status.innerText = `ピン調整モード: ${isDebugMode ? 'ON 🟢 (ピンをドラッグして動かせます)' : 'OFF ⚪'}`;
+            outBox.style.display = isDebugMode ? 'block' : 'none';
+            renderMapPins();
+        }
 
         function selectTitleColor(color, element) {
             selectedTitleColor = color;
@@ -733,6 +788,7 @@
         }
 
         mapContainer.addEventListener('mousedown', (e) => {
+            if (isDebugMode) return;
             e.preventDefault();
             panning = true;
             startX = e.clientX - pointX;
@@ -740,7 +796,7 @@
         });
 
         window.addEventListener('mousemove', (e) => {
-            if (!panning) return;
+            if (!panning || isDebugMode) return;
             pointX = e.clientX - startX;
             pointY = e.clientY - startY;
             applyTransform();
@@ -751,6 +807,7 @@
         });
 
         mapContainer.addEventListener('touchstart', (e) => {
+            if (isDebugMode) return;
             if (e.touches.length === 1) {
                 panning = true;
                 startX = e.touches[0].clientX - pointX;
@@ -765,6 +822,7 @@
         }, { passive: false });
 
         mapContainer.addEventListener('touchmove', (e) => {
+            if (isDebugMode) return;
             if (panning && e.touches.length === 1) {
                 pointX = e.touches[0].clientX - startX;
                 pointY = e.touches[0].clientY - startY;
@@ -798,7 +856,7 @@
             if (e.touches.length < 2) {
                 lastTouchDistance = 0;
             }
-            if (e.touches.length === 1) {
+            if (e.touches.length === 1 && !isDebugMode) {
                 panning = true;
                 startX = e.touches[0].clientX - pointX;
                 startY = e.touches[0].clientY - pointY;
@@ -828,6 +886,7 @@
         }
 
         function goToMemory(prefKey) {
+            if (isDebugMode) return;
             switchScreen('view');
             const viewSelect = document.getElementById('viewPrefSelect');
             if (viewSelect) {
@@ -848,20 +907,61 @@
                 const hasData = memories[key] && memories[key].length > 0;
 
                 const pin = document.createElement('div');
-                pin.className = `map-pin ${hasData ? '' : 'no-data'}`;
+                pin.className = `map-pin ${hasData ? '' : 'no-data'} ${isDebugMode ? 'dragging' : ''}`;
                 pin.style.left = `${coord.x}%`;
                 pin.style.top = `${coord.y}%`;
-                pin.title = prefNames[key] + (hasData ? ' (思い出あり)' : '');
-                
-                pin.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    goToMemory(key);
-                });
-                pin.addEventListener('touchend', (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    goToMemory(key);
-                });
+                pin.title = prefNames[key];
+
+                if (isDebugMode) {
+                    // 🛠️ ドラッグでピン位置を変更できるロジック
+                    let isDraggingPin = false;
+
+                    const onPinMove = (clientX, clientY) => {
+                        const imgRect = document.getElementById('japanMapImg').getBoundingClientRect();
+                        const xPx = clientX - imgRect.left;
+                        const yPx = clientY - imgRect.top;
+                        const xPct = Math.max(0, Math.min(100, (xPx / imgRect.width) * 100));
+                        const yPct = Math.max(0, Math.min(100, (yPx / imgRect.height) * 100));
+
+                        prefCoords[key] = { x: parseFloat(xPct.toFixed(1)), y: parseFloat(yPct.toFixed(1)) };
+                        pin.style.left = `${prefCoords[key].x}%`;
+                        pin.style.top = `${prefCoords[key].y}%`;
+
+                        const outBox = document.getElementById('coordOutputBox');
+                        outBox.innerText = `【調整中コード】\n${key}: { x: ${prefCoords[key].x}, y: ${prefCoords[key].y} },\n\n全コードコピー用はコンソール(F12)に出力中`;
+                        console.log(`prefCoords.${key} = { x: ${prefCoords[key].x}, y: ${prefCoords[key].y} };`);
+                    };
+
+                    pin.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        isDraggingPin = true;
+                    });
+                    window.addEventListener('mousemove', (e) => {
+                        if (isDraggingPin) onPinMove(e.clientX, e.clientY);
+                    });
+                    window.addEventListener('mouseup', () => { isDraggingPin = false; });
+
+                    pin.addEventListener('touchstart', (e) => {
+                        e.stopPropagation();
+                        isDraggingPin = true;
+                    }, { passive: false });
+                    window.addEventListener('touchmove', (e) => {
+                        if (isDraggingPin && e.touches.length > 0) {
+                            onPinMove(e.touches[0].clientX, e.touches[0].clientY);
+                        }
+                    }, { passive: false });
+                    window.addEventListener('touchend', () => { isDraggingPin = false; });
+                } else {
+                    pin.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        goToMemory(key);
+                    });
+                    pin.addEventListener('touchend', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        goToMemory(key);
+                    });
+                }
 
                 wrapper.appendChild(pin);
             }
