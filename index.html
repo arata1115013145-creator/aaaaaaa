@@ -540,7 +540,7 @@
         </button>
         <button class="nav-btn" id="nav-all" onclick="switchScreen('all')">
             <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-            一覧・共有
+            一覧
         </button>
     </div>
 
@@ -583,7 +583,7 @@
         let memories = {};
         let db = null;
         let selectedTitleColor = '#263849';
-        let isMapMoving = false; // ズーム・パン中の誤タップ防止フラグ
+        let isMapMoving = false;
 
         function selectTitleColor(color, element) {
             selectedTitleColor = color;
@@ -723,7 +723,7 @@
 
         window.addEventListener('mousemove', (e) => {
             if (!panning) return;
-            isMapMoving = true; // 動かしている判定
+            isMapMoving = true;
             pointX = e.clientX - startX;
             pointY = e.clientY - startY;
             applyTransform();
@@ -749,7 +749,7 @@
         }, { passive: false });
 
         mapContainer.addEventListener('touchmove', (e) => {
-            isMapMoving = true; // タッチして動かしている判定
+            isMapMoving = true;
             if (panning && e.touches.length === 1) {
                 pointX = e.touches[0].clientX - startX;
                 pointY = e.touches[0].clientY - startY;
@@ -790,7 +790,6 @@
             } else {
                 panning = false;
             }
-            // 少し遅らせて移動判定をリセット（ズーム直後のタップ誤爆を防ぐ）
             setTimeout(() => { isMapMoving = false; }, 150);
         });
 
@@ -815,7 +814,7 @@
         }
 
         function goToMemory(prefKey) {
-            if (isMapMoving) return; // 地図を動かした直後やズーム操作中の場合はタップを無効化
+            if (isMapMoving) return;
             switchScreen('view');
             const viewSelect = document.getElementById('viewPrefSelect');
             if (viewSelect) {
