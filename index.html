@@ -77,7 +77,7 @@
             padding-bottom: 6px; 
         }
 
-        /* 🗺️ 日本地図コンテナ（枠内に完全に収める調整） */
+        /* 🗺️ 日本地図コンテナ（余白を削ってぴったりサイズに調整） */
         .map-card {
             background: #fffef8;
             border-radius: 16px;
@@ -89,7 +89,7 @@
             position: relative;
             width: 100%;
             max-width: 320px;
-            height: 440px;
+            height: 380px; /* 余分な下部余白をなくすため高さを調整 */
             margin: 0 auto;
             overflow: hidden;
             border-radius: 12px;
@@ -585,7 +585,6 @@
             fukuoka: "福岡県", saga: "佐賀県", nagasaki: "長崎県", kumamoto: "熊本県", oita: "大分県", miyazaki: "宮崎県", kagoshima: "鹿児島県", okinawa: "沖縄県"
         };
 
-        // 🎯 完璧に微調整した47都道府県のピン座標
         const prefCoords = {
             hokkaido: { x: 74.0, y: 16.5 }, aomori: { x: 67.5, y: 31.0 }, iwate: { x: 72.5, y: 37.0 }, akita: { x: 63.5, y: 39.5 },
             yamagata: { x: 64.5, y: 46.0 }, miyagi: { x: 70.0, y: 46.0 }, fukushima: { x: 66.5, y: 52.0 },
@@ -693,7 +692,6 @@
             }, 1000);
         }
 
-        // 🔍 二本指中心ズーム＆パン操作
         let scale = 1;
         let pointX = 0;
         let pointY = 0;
@@ -712,7 +710,7 @@
             const containerW = mapContainer.clientWidth;
             const containerH = mapContainer.clientHeight;
             const mapW = 300 * scale;
-            const mapH = 420 * scale;
+            const mapH = 370 * scale;
 
             const minX = containerW - mapW;
             const minY = containerH - mapH;
@@ -777,7 +775,6 @@
                     e.touches[0].clientY - e.touches[1].clientY
                 );
                 
-                // 二本指の中点（中心位置）を計算
                 const rect = mapContainer.getBoundingClientRect();
                 const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
                 const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
@@ -786,7 +783,6 @@
                     const zoomFactor = currentDistance / lastTouchDistance;
                     const newScale = scale * zoomFactor;
                     if (newScale >= 1 && newScale <= 3.5) {
-                        // 中心を基準に拡大・縮小
                         pointX = midX - (midX - pointX) * (newScale / scale);
                         pointY = midY - (midY - pointY) * (newScale / scale);
                         scale = newScale;
