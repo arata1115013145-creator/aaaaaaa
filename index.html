@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旅行の思い出アルバム</title>
+    <title>サクラ日記</title>
 
-    <!-- スマホのホーム画面から開いたときにブラウザの枠を消す設定 -->
+    <!-- スマホのホーム画面用設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- アプリ名とアイコンの設定 -->
+    <meta name="apple-mobile-web-app-title" content="サクラ日記">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" href="icon.png">
 
     <style>
         body { 
@@ -342,7 +347,6 @@
         }
         .submit-btn:hover { background-color: #6f89a8; }
 
-        /* カラーピッカー用スタイル */
         .color-picker-group {
             display: flex;
             gap: 8px;
@@ -361,7 +365,7 @@
             transform: scale(1.1);
         }
 
-        /* 📱 4つになった下部ナビゲーションバー */
+        /* 📱 下部ナビゲーションバー */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -414,7 +418,7 @@
 
     <!-- ヘッダーエリア -->
     <div class="app-header">
-        <h1>旅行の思い出アルバム</h1>
+        <h1>サクラ日記</h1>
     </div>
 
     <!-- 💬 ポップアップ通知 -->
@@ -636,7 +640,7 @@
         </div>
     </div>
 
-    <!-- 画面④：思い出一覧画面（新設） -->
+    <!-- 画面④：思い出一覧画面 -->
     <div id="screen-all" class="screen">
         <div class="container">
             <h3>すべての思い出</h3>
@@ -714,7 +718,7 @@
 
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open("TravelAlbumDB", 1);
+                const request = indexedDB.open("SakuraDiaryDB", 1);
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
                     db = request.result;
@@ -760,7 +764,6 @@
             });
         }
 
-        // URL共有データ読み込みのチェック（起動時）
         async function checkSharedUrlData() {
             const params = new URLSearchParams(window.location.search);
             const sharedData = params.get('share');
@@ -771,13 +774,11 @@
                         if (!memories[decoded.prefKey]) {
                             memories[decoded.prefKey] = [];
                         }
-                        // 重複防止のため同IDがなければ追加
                         if (!memories[decoded.prefKey].some(m => m.id === decoded.item.id)) {
                             memories[decoded.prefKey].push(decoded.item);
                             await saveMemoriesToDB();
                             alert(`${prefNames[decoded.prefKey]}の共有された思い出を追加しました！`);
                         }
-                        // URLのクエリをきれいにする
                         window.history.replaceState({}, document.title, window.location.pathname);
                     }
                 } catch (e) {
@@ -959,7 +960,6 @@
             showMemory(prefKey);
         }
 
-        // 思い出カードのHTML生成ヘルパー（共有・編集機能付き）
         function generateMemoryCardHtml(item, prefKey) {
             let photoTags = '';
             if (item.photos && item.photos.length > 0) {
@@ -1016,13 +1016,11 @@
             `;
         }
 
-        // 4ページ目：すべての思い出一覧＆並び替え
         function renderAllMemories() {
             const sortType = document.getElementById('sortSelect').value;
             const area = document.getElementById('allMemoryArea');
             if (!area) return;
 
-            // すべての思い出アイテムをフラットな配列にする
             let allItems = [];
             for (let pKey in memories) {
                 if (memories[pKey] && Array.isArray(memories[pKey])) {
@@ -1037,7 +1035,6 @@
                 return;
             }
 
-            // 並び替えロジック
             if (sortType === 'newest') {
                 allItems.sort((a, b) => b.id - a.id);
             } else if (sortType === 'count') {
@@ -1053,7 +1050,6 @@
             area.innerHTML = html;
         }
 
-        // 編集モードへの切り替え
         function startEditMemory(prefKey, itemId) {
             const item = memories[prefKey].find(m => m.id === itemId);
             if (!item) return;
@@ -1078,7 +1074,6 @@
             `;
         }
 
-        // 編集内容の保存
         async function saveEditMemory(prefKey, itemId) {
             const item = memories[prefKey].find(m => m.id === itemId);
             if (!item) return;
@@ -1099,7 +1094,6 @@
             }
         }
 
-        // 共有URLの発行（Base64エンコード）
         function shareMemory(prefKey, itemId) {
             const item = memories[prefKey].find(m => m.id === itemId);
             if (!item) return;
