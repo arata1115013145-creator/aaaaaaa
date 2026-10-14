@@ -77,7 +77,7 @@
             padding-bottom: 6px; 
         }
 
-        /* 🗺️ 日本地図コンテナ（画像マップ表示用） */
+        /* 🗺️ 日本地図コンテナ */
         .map-card {
             background: #fffef8;
             border-radius: 16px;
@@ -94,45 +94,46 @@
             overflow: hidden;
             background: #faf9f1;
             border: 1px solid #f0ede3;
+            touch-action: manipulation;
         }
         .map-image {
             width: 100%;
             height: auto;
             display: block;
+            pointer-events: none;
         }
 
         /* 🟡 ふわっと光る黄色のピン（マーカー） */
         .map-pin {
             position: absolute;
-            width: 22px;
-            height: 22px;
-            background: rgba(255, 235, 59, 0.65);
-            border: 2px solid #f59f00;
+            width: 26px;
+            height: 26px;
+            background: rgba(255, 235, 59, 0.75);
+            border: 2.5px solid #f59f00;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
-            transition: all 0.2s ease;
+            z-index: 10;
             box-shadow: 0 0 8px rgba(245, 159, 0, 0.6);
             animation: pulsePin 2s infinite;
         }
-        .map-pin:hover {
-            transform: translate(-50%, -50%) scale(1.25);
-            background: rgba(255, 235, 59, 0.9);
+        .map-pin:hover, .map-pin:active {
+            transform: translate(-50%, -50%) scale(1.3);
+            background: rgba(255, 235, 59, 0.95);
         }
-        /* 思い出がまだない県のピンは目立たなく、または小さく */
         .map-pin.no-data {
-            background: rgba(200, 200, 200, 0.2);
-            border: 1.5px solid rgba(150, 150, 150, 0.5);
-            width: 14px;
-            height: 14px;
+            background: rgba(150, 150, 150, 0.25);
+            border: 1.5px solid rgba(120, 120, 120, 0.6);
+            width: 16px;
+            height: 16px;
             box-shadow: none;
             animation: none;
         }
-        .map-pin.no-data:hover {
-            background: rgba(255, 235, 59, 0.5);
+        .map-pin.no-data:hover, .map-pin.no-data:active {
+            background: rgba(255, 235, 59, 0.6);
             border-color: #f59f00;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
         }
 
         @keyframes pulsePin {
@@ -525,7 +526,7 @@
         <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
     </div>
 
-    <!-- 📱 4つになった下部ナビゲーションバー -->
+    <!-- 📱 下部ナビゲーションバー -->
     <div class="nav-bar">
         <button class="nav-btn active" id="nav-map" onclick="switchScreen('map')">
             <svg viewBox="0 0 24 24"><path d="M9 18l-6-.5V6l6 .5M9 18l6-1.5m-6 1.5v-12l6 1.5m0 10.5l6-.5V5l-6 .5m0 12v-12"/></svg>
@@ -566,20 +567,19 @@
             fukuoka: "福岡県", saga: "佐賀県", nagasaki: "長崎県", kumamoto: "熊本県", oita: "大分県", miyazaki: "宮崎県", kagoshima: "鹿児島県", okinawa: "沖縄県"
         };
 
-        // 日本地図画像上の各都道府県の位置座標（パーセント %）
         const prefCoords = {
-            hokkaido: { x: 82, y: 15 }, aomori: { x: 71, y: 32 }, iwate: { x: 76, y: 40 }, akita: { x: 67, y: 41 },
-            yamagata: { x: 68, y: 49 }, miyagi: { x: 75, y: 49 }, fukushima: { x: 70, y: 56 },
-            ibaraki: { x: 75, y: 62 }, tochigi: { x: 71, y: 61 }, gunma: { x: 67, y: 61 }, saitama: { x: 68, y: 64 },
-            chiba: { x: 74, y: 65 }, tokyo: { x: 70, y: 65 }, kanagawa: { x: 70, y: 68 },
-            niigata: { x: 63, y: 50 }, toyama: { x: 57, y: 55 }, ishikawa: { x: 54, y: 52 }, fukui: { x: 55, y: 58 },
-            yamanashi: { x: 65, y: 65 }, nagano: { x: 62, y: 60 }, gifu: { x: 59, y: 60 }, shizuoka: { x: 67, y: 69 }, aichi: { x: 61, y: 67 },
-            mie: { x: 59, y: 70 }, shiga: { x: 56, y: 62 }, kyoto: { x: 54, y: 62 }, osaka: { x: 53, y: 66 },
-            hyogo: { x: 50, y: 62 }, nara: { x: 56, y: 67 }, wakayama: { x: 54, y: 71 },
-            tottori: { x: 45, y: 62 }, shimane: { x: 40, y: 62 }, okayama: { x: 46, y: 66 }, hiroshima: { x: 42, y: 67 }, yamaguchi: { x: 37, y: 69 },
-            tokushima: { x: 48, y: 73 }, kagawa: { x: 46, y: 71 }, ehime: { x: 43, y: 74 }, kochi: { x: 45, y: 78 },
-            fukuoka: { x: 33, y: 73 }, saga: { x: 30, y: 74 }, nagasaki: { x: 27, y: 76 }, kumamoto: { x: 31, y: 78 },
-            oita: { x: 35, y: 75 }, miyazaki: { x: 35, y: 82 }, kagoshima: { x: 31, y: 86 }, okinawa: { x: 23, y: 92 }
+            hokkaido: { x: 79, y: 16 }, aomori: { x: 70, y: 31 }, iwate: { x: 75, y: 38 }, akita: { x: 66, y: 40 },
+            yamagata: { x: 67, y: 48 }, miyagi: { x: 73, y: 47 }, fukushima: { x: 69, y: 54 },
+            ibaraki: { x: 73, y: 60 }, tochigi: { x: 69, y: 59 }, gunma: { x: 65, y: 59 }, saitama: { x: 67, y: 62 },
+            chiba: { x: 72, y: 63 }, tokyo: { x: 68, y: 63 }, kanagawa: { x: 68, y: 66 },
+            niigata: { x: 62, y: 49 }, toyama: { x: 56, y: 54 }, ishikawa: { x: 53, y: 51 }, fukui: { x: 54, y: 57 },
+            yamanashi: { x: 63, y: 63 }, nagano: { x: 60, y: 58 }, gifu: { x: 58, y: 58 }, shizuoka: { x: 65, y: 67 }, aichi: { x: 59, y: 65 },
+            mie: { x: 57, y: 68 }, shiga: { x: 54, y: 60 }, kyoto: { x: 52, y: 60 }, osaka: { x: 51, y: 64 },
+            hyogo: { x: 48, y: 60 }, nara: { x: 54, y: 65 }, wakayama: { x: 52, y: 69 },
+            tottori: { x: 43, y: 60 }, shimane: { x: 38, y: 60 }, okayama: { x: 44, y: 64 }, hiroshima: { x: 40, y: 65 }, yamaguchi: { x: 35, y: 67 },
+            tokushima: { x: 46, y: 71 }, kagawa: { x: 44, y: 69 }, ehime: { x: 41, y: 72 }, kochi: { x: 43, y: 76 },
+            fukuoka: { x: 31, y: 71 }, saga: { x: 28, y: 72 }, nagasaki: { x: 25, y: 74 }, kumamoto: { x: 29, y: 76 },
+            oita: { x: 33, y: 73 }, miyazaki: { x: 33, y: 80 }, kagoshima: { x: 29, y: 84 }, okinawa: { x: 21, y: 91 }
         };
 
         let memories = {};
@@ -669,7 +669,7 @@
             const toast = document.getElementById('comicToast');
             if (!toast) return;
             toast.classList.add('show');
-            setTimeout => {
+            setTimeout(() => {
                 toast.classList.remove('show');
             }, 1000);
         }
@@ -703,16 +703,13 @@
             }
         }
 
-        // 日本地図画像上にピンをレンダリングする関数
         function renderMapPins() {
             const wrapper = document.getElementById('mapWrapper');
             if (!wrapper) return;
 
-            // 既存のピンを一度クリア（画像タグは残す）
             const existingPins = wrapper.querySelectorAll('.map-pin');
             existingPins.forEach(p => p.remove());
 
-            // 各都道府県のピンを生成して配置
             for (let key in prefCoords) {
                 const coord = prefCoords[key];
                 const hasData = memories[key] && memories[key].length > 0;
@@ -722,7 +719,16 @@
                 pin.style.left = `${coord.x}%`;
                 pin.style.top = `${coord.y}%`;
                 pin.title = prefNames[key] + (hasData ? ' (思い出あり)' : '');
-                pin.onclick = () => goToMemory(key);
+                
+                pin.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    goToMemory(key);
+                });
+                pin.addEventListener('touchend', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    goToMemory(key);
+                });
 
                 wrapper.appendChild(pin);
             }
@@ -1070,4 +1076,3 @@
 
 </body>
 </html>
-
