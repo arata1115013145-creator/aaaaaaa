@@ -77,7 +77,7 @@
             padding-bottom: 6px; 
         }
 
-        /* 🗺️ 日本地図コンテナ */
+        /* 🗺️ 日本地図コンテナ（上下余白を完全に均一化） */
         .map-card {
             background: #fffef8;
             border-radius: 16px;
@@ -105,7 +105,7 @@
         .map-wrapper {
             position: absolute;
             left: 0;
-            top: 0;
+            top: 14px; /* ここで上下の余白を完全にイコールに調整 */
             width: 300px;
             height: auto;
             transform-origin: 0 0;
@@ -696,8 +696,8 @@
             const minX = containerW - mapW;
             const minY = containerH - mapH;
 
-            // 上下の余白を均一にするための垂直方向オフセット（12px下にシフト）
-            const verticalOffset = 12;
+            // CSS側で指定したtopオフセット（14px）をベースに位置を計算
+            const baseOffsetY = 14;
 
             if (mapW <= containerW) {
                 pointX = (containerW - mapW) / 2;
@@ -707,10 +707,10 @@
             }
 
             if (mapH <= containerH) {
-                pointY = (containerH - mapH) / 2 + verticalOffset;
+                pointY = (containerH - mapH) / 2 + baseOffsetY;
             } else {
-                if (pointY > verticalOffset) pointY = verticalOffset;
-                if (pointY < minY + verticalOffset) pointY = minY + verticalOffset;
+                if (pointY > baseOffsetY) pointY = baseOffsetY;
+                if (pointY < minY + baseOffsetY) pointY = minY + baseOffsetY;
             }
 
             mapWrapper.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
