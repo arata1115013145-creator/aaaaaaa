@@ -119,44 +119,44 @@
             pointer-events: none;
         }
 
-        /* 🟡 小さくすっきりした黄色のピン */
+        /* 🟡 極小化した上品な黄色のピン（面積1/4サイズ） */
         .map-pin {
             position: absolute;
-            width: 16px;
-            height: 16px;
-            background: rgba(255, 235, 59, 0.9);
-            border: 2px solid #f59f00;
+            width: 9px;
+            height: 9px;
+            background: rgba(255, 235, 59, 0.95);
+            border: 1.5px solid #f59f00;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
             z-index: 10;
-            box-shadow: 0 0 6px rgba(245, 159, 0, 0.5);
+            box-shadow: 0 0 4px rgba(245, 159, 0, 0.5);
             animation: pulsePin 2s infinite;
         }
         .map-pin:hover {
-            transform: translate(-50%, -50%) scale(1.4);
+            transform: translate(-50%, -50%) scale(2);
         }
         .map-pin.no-data {
             background: rgba(150, 150, 150, 0.4);
-            border: 1.5px solid rgba(120, 120, 120, 0.8);
-            width: 12px;
-            height: 12px;
+            border: 1px solid rgba(120, 120, 120, 0.8);
+            width: 6px;
+            height: 6px;
             box-shadow: none;
             animation: none;
         }
 
         /* 🛠️ 調整モード中のピン表示 */
         .map-pin.dragging {
-            background: rgba(255, 0, 0, 0.8) !important;
-            border: 2px solid #fff !important;
-            transform: translate(-50%, -50%) scale(1.6);
+            background: rgba(255, 0, 0, 0.9) !important;
+            border: 1.5px solid #fff !important;
+            transform: translate(-50%, -50%) scale(2.2);
             z-index: 1000;
             animation: none;
         }
 
         @keyframes pulsePin {
             0% { box-shadow: 0 0 0 0 rgba(245, 159, 0, 0.4); }
-            70% { box-shadow: 0 0 0 6px rgba(245, 159, 0, 0); }
+            70% { box-shadow: 0 0 0 4px rgba(245, 159, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(245, 159, 0, 0); }
         }
 
@@ -631,18 +631,18 @@
         };
 
         const prefCoords = {
-            hokkaido: { x: 74.0, y: 16.5 }, aomori: { x: 67.5, y: 31.0 }, iwate: { x: 72.5, y: 37.0 }, akita: { x: 63.5, y: 39.5 },
+            hokkaido: { x: 77, y: 20.3 }, aomori: { x: 67.5, y: 31.0 }, iwate: { x: 72.5, y: 37.0 }, akita: { x: 63.5, y: 39.5 },
             yamagata: { x: 64.5, y: 46.0 }, miyagi: { x: 70.0, y: 46.0 }, fukushima: { x: 66.5, y: 52.0 },
             ibaraki: { x: 70.5, y: 58.0 }, tochigi: { x: 66.5, y: 57.0 }, gunma: { x: 62.5, y: 57.0 }, saitama: { x: 64.5, y: 60.0 },
             chiba: { x: 69.0, y: 61.0 }, tokyo: { x: 65.0, y: 61.0 }, kanagawa: { x: 65.0, y: 64.0 },
             niigata: { x: 59.5, y: 48.0 }, toyama: { x: 53.5, y: 52.0 }, ishikawa: { x: 50.5, y: 49.5 }, fukui: { x: 51.5, y: 55.0 },
             yamanashi: { x: 60.0, y: 61.0 }, nagano: { x: 57.0, y: 56.0 }, gifu: { x: 55.0, y: 56.0 }, shizuoka: { x: 62.0, y: 64.0 }, aichi: { x: 56.0, y: 63.0 },
             mie: { x: 54.0, y: 66.0 }, shiga: { x: 51.5, y: 58.0 }, kyoto: { x: 49.5, y: 58.0 }, osaka: { x: 48.5, y: 62.0 },
-            hyogo: { x: 45.5, y: 58.0 }, nara: { x: 51.0, y: 63.0 }, wakayama: { x: 49.0, y: 67.0 },
-            tottori: { x: 40.5, y: 58.0 }, shimane: { x: 35.5, y: 58.0 }, okayama: { x: 41.5, y: 62.0 }, hiroshima: { x: 37.5, y: 63.0 }, yamaguchi: { x: 32.5, y: 65.0 },
-            tokushima: { x: 43.5, y: 68.0 }, kagawa: { x: 41.5, y: 66.0 }, ehime: { x: 38.5, y: 69.0 }, kochi: { x: 40.5, y: 73.0 },
-            fukuoka: { x: 28.5, y: 68.0 }, saga: { x: 25.5, y: 69.0 }, nagasaki: { x: 22.5, y: 71.0 }, kumamoto: { x: 26.5, y: 73.0 },
-            oita: { x: 30.5, y: 70.0 }, miyazaki: { x: 30.5, y: 77.0 }, kagoshima: { x: 26.5, y: 81.0 }, okinawa: { x: 19.5, y: 88.0 }
+            hyogo: { x: 37.7, y: 68.7 }, nara: { x: 51.0, y: 63.0 }, wakayama: { x: 41.1, y: 75.8 },
+            tottori: { x: 35.4, y: 66.4 }, shimane: { x: 26.7, y: 69.2 }, okayama: { x: 33.1, y: 71.1 }, hiroshima: { x: 27.1, y: 71.4 }, yamaguchi: { x: 22.4, y: 73.8 },
+            tokushima: { x: 35.1, y: 76.2 }, kagawa: { x: 34.4, y: 73.8 }, ehime: { x: 28.4, y: 77.2 }, kochi: { x: 29.4, y: 79.5 },
+            fukuoka: { x: 19.1, y: 76.5 }, saga: { x: 13.4, y: 77.5 }, nagasaki: { x: 14.1, y: 80.3 }, kumamoto: { x: 19.1, y: 82.7 },
+            oita: { x: 22.4, y: 79.6 }, miyazaki: { x: 20.8, y: 88 }, kagoshima: { x: 16.1, y: 92 }, okinawa: { x: 12.1, y: 100 }
         };
 
         let memories = {};
@@ -913,7 +913,6 @@
                 pin.title = prefNames[key];
 
                 if (isDebugMode) {
-                    // 🛠️ ドラッグでピン位置を変更できるロジック
                     let isDraggingPin = false;
 
                     const onPinMove = (clientX, clientY) => {
