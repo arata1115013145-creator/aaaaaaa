@@ -105,7 +105,7 @@
         .map-wrapper {
             position: absolute;
             left: 0;
-            top: 0;
+            top: 14px;
             width: 300px;
             height: auto;
             transform-origin: 0 0;
@@ -119,7 +119,7 @@
             pointer-events: none;
         }
 
-        /* 🟡 極小化した上品な黄色のピン（面積1/4サイズ） */
+        /* 🟡 極小化した上品な黄色のピン */
         .map-pin {
             position: absolute;
             width: 9px;
@@ -164,6 +164,21 @@
             border: none;
         }
 
+        /* 🔒 タイムカプセルボックス */
+        .capsule-box {
+            background: #f3f6fa;
+            border: 1.5px dashed #829bb8;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .capsule-locked {
+            color: #6c757d;
+            text-align: center;
+            padding: 6px;
+        }
+
         .gallery {
             display: flex;
             gap: 6px;
@@ -183,6 +198,7 @@
             cursor: pointer;
         }
 
+        /* トースト通知（改行せず1行で綺麗に収まるように設定） */
         #comicToast {
             display: none;
             position: fixed;
@@ -192,7 +208,7 @@
             background: #ffffff;
             border: 2.5px solid #829bb8;
             border-radius: 20px;
-            padding: 14px 24px;
+            padding: 12px 22px;
             font-size: 14px;
             font-weight: bold;
             color: #829bb8;
@@ -202,6 +218,8 @@
             transition: transform 0.2s ease, opacity 0.2s ease;
             opacity: 0;
             text-align: center;
+            white-space: nowrap;
+            max-width: none;
         }
         #comicToast::after {
             content: '';
@@ -493,6 +511,32 @@
                     <label for="prefComment">ひとことメモ:</label>
                     <textarea id="prefComment" rows="2" placeholder="感想などを入力"></textarea>
                 </div>
+
+                <!-- 🔒 タイムカプセル設定エリア（日付とGPSのみ） -->
+                <div style="background: #f3f6fa; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px; margin-bottom: 10px;">
+                    <label style="font-weight: bold; color: #829bb8; font-size: 13px; margin-bottom: 6px; display:block;">🔒 タイムカプセル（秘密のメッセージ）</label>
+                    
+                    <div class="form-group">
+                        <label for="capsuleType">ロック条件:</label>
+                        <select id="capsuleType" onchange="toggleCapsuleInputs()">
+                            <option value="none">設定しない</option>
+                            <option value="date">日付指定で開封</option>
+                            <option value="gps">GPS（その県に到着）で開封</option>
+                        </select>
+                    </div>
+
+                    <div id="capsuleInputs" style="display: none;">
+                        <div class="form-group" id="groupUnlockDate" style="display: none;">
+                            <label for="unlockDate">開封日:</label>
+                            <input type="date" id="unlockDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="secretMessage">秘密のメッセージ:</label>
+                            <textarea id="secretMessage" rows="2" placeholder="未来の自分へ伝えたいメッセージ"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="prefPhotos">写真を一気に何枚でも選択:</label>
                     <input type="file" id="prefPhotos" accept="image/*" multiple required>
@@ -589,6 +633,19 @@
             selectedTitleColor = color;
             document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
+        }
+
+        function toggleCapsuleInputs() {
+            const type = document.getElementById('capsuleType').value;
+            const container = document.getElementById('capsuleInputs');
+            const groupDate = document.getElementById('groupUnlockDate');
+
+            if (type === 'none') {
+                container.style.display = 'none';
+            } else {
+                container.style.display = 'block';
+                groupDate.style.display = type === 'date' ? 'block' : 'none';
+            }
         }
 
         function initDB() {
@@ -695,9 +752,7 @@
 
             const minX = containerW - mapW;
             const minY = containerH - mapH;
-
-            // 上下の余白を均一にするための垂直方向オフセット（12px下にシフト）
-            const verticalOffset = 12;
+            const baseOffsetY = 14;
 
             if (mapW <= containerW) {
                 pointX = (containerW - mapW) / 2;
@@ -707,10 +762,10 @@
             }
 
             if (mapH <= containerH) {
-                pointY = (containerH - mapH) / 2 + verticalOffset;
+                pointY = (containerH - mapH) / 2 + baseOffsetY;
             } else {
-                if (pointY > verticalOffset) pointY = verticalOffset;
-                if (pointY < minY + verticalOffset) pointY = minY + verticalOffset;
+                if (pointY > baseOffsetY) pointY = baseOffsetY;
+                if (pointY < minY + baseOffsetY) pointY = minY + baseOffsetY;
             }
 
             mapWrapper.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
@@ -884,6 +939,45 @@
             showMemory(prefKey);
         }
 
+        // 🔒 タイムカプセルの開封判定チェック
+        function checkCapsuleUnlocked(item, prefKey) {
+            if (!item.capsule || item.capsule.type === 'none') return true;
+            if (item.capsule.unlocked) return true;
+
+            const cap = item.capsule;
+            const today = new Date().toISOString().split('T')[0];
+
+            if (cap.type === 'date') {
+                if (today >= cap.unlockDate) {
+                    item.capsule.unlocked = true;
+                    saveMemoriesToDB();
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+        function unlockGpsCapsule(prefKey, itemId) {
+            if (!navigator.geolocation) {
+                alert('お使いのブラウザではGPSがサポートされていません。');
+                return;
+            }
+            alert('現在地を確認中...');
+            navigator.geolocation.getCurrentPosition((position) => {
+                const item = memories[prefKey].find(m => m.id === itemId);
+                if (item) {
+                    item.capsule.unlocked = true;
+                    saveMemoriesToDB();
+                    showComicToast();
+                    showMemory(prefKey);
+                }
+            }, (error) => {
+                alert('位置情報の取得に失敗しました。GPSを有効にしてください。');
+            }, { timeout: 10000 });
+        }
+
         function generateMemoryCardHtml(item, prefKey) {
             let photoTags = '';
             if (item.photos && item.photos.length > 0) {
@@ -897,11 +991,40 @@
 
             const titleColor = item.titleColor || '#829bb8';
 
+            let capsuleHtml = '';
+            if (item.capsule && item.capsule.type && item.capsule.type !== 'none') {
+                const isUnlocked = checkCapsuleUnlocked(item, prefKey);
+                if (isUnlocked) {
+                    capsuleHtml = `
+                        <div class="capsule-box" style="border-color: #2b8a3e; background: #f4fbf5;">
+                            <div style="font-weight:bold; color:#2b8a3e; margin-bottom:2px;">🔓 タイムカプセル開封済み！</div>
+                            <p style="margin:2px 0;"><strong>秘密のメッセージ:</strong> ${item.capsule.secretMessage}</p>
+                        </div>
+                    `;
+                } else {
+                    if (item.capsule.type === 'date') {
+                        capsuleHtml = `
+                            <div class="capsule-box">
+                                <div class="capsule-locked">🔒 タイムカプセル（${item.capsule.unlockDate} までロック中）</div>
+                            </div>
+                        `;
+                    } else if (item.capsule.type === 'gps') {
+                        capsuleHtml = `
+                            <div class="capsule-box" style="text-align:center;">
+                                <div class="capsule-locked" style="margin-bottom:4px;">🔒 GPSカプセル（${prefNames[prefKey]}に到着すると開きます）</div>
+                                <button class="action-btn" style="font-size:10px; padding:4px 8px;" onclick="unlockGpsCapsule('${prefKey}', ${item.id})">現地にいるかGPSで確認する</button>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
             return `
                 <div class="memory-card" id="card-${item.id}">
                     <h3 style="color: ${titleColor};">${item.title} (${prefNames[prefKey]})</h3>
                     <p style="font-size:11px; margin: 2px 0;"><strong>訪問時期:</strong> <span id="date-val-${item.id}">${item.date || '未設定'}</span></p>
                     <p style="font-size:11px; margin: 2px 0;"><strong>ひとことメモ:</strong> <span id="comment-val-${item.id}">${item.comment || 'なし'}</span></p>
+                    ${capsuleHtml}
                     <div class="gallery">${photoTags}</div>
                     <div class="btn-row">
                         <button class="action-btn" onclick="shareMemory('${prefKey}', ${item.id})">共有URL発行</button>
@@ -1029,7 +1152,7 @@
 
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert('共有URLをコピーしました！このURLを同じアプリを持つ友だちに送ると、一斉にアルバムに追加できます。');
+                    alert('共有URLをコピーしました！友達に送ると、タイムカプセル付きの思い出が共有されます。');
                 }).catch(() => {
                     prompt('以下のURLをコピーしてください:', shareUrl);
                 });
@@ -1113,6 +1236,10 @@
             const dateInput = document.getElementById('prefDate');
             const commentInput = document.getElementById('prefComment');
             const fileInput = document.getElementById('prefPhotos');
+            
+            const capsuleType = document.getElementById('capsuleType').value;
+            const unlockDate = document.getElementById('unlockDate').value;
+            const secretMessage = document.getElementById('secretMessage').value;
 
             if (!selectBox || !titleInput || !fileInput) return;
 
@@ -1131,7 +1258,13 @@
                 titleColor: selectedTitleColor,
                 date: date,
                 comment: comment,
-                photos: []
+                photos: [],
+                capsule: {
+                    type: capsuleType,
+                    unlockDate: unlockDate,
+                    secretMessage: secretMessage,
+                    unlocked: false
+                }
             };
 
             const files = fileInput.files;
@@ -1145,6 +1278,7 @@
 
                 const form = document.getElementById('memoryForm');
                 if (form) form.reset();
+                toggleCapsuleInputs();
 
                 setTimeout(() => {
                     switchScreen('view');
